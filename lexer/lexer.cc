@@ -91,6 +91,16 @@ bool Lexer::scan() {
             return false;
           }
           continue;
+        } else if (c == '=') {
+          if (f.peek() == '=') {
+            f.get(c);
+            tokens_.push_back(std::make_unique<OperatorToken>(
+                Operator::EQUALS, line, position, file_name()));
+          } else {
+            tokens_.push_back(std::make_unique<OperatorToken>(
+                Operator::ASSIGN, line, position, file_name()));
+          }
+          continue;
         }
       }
       default:

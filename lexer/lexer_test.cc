@@ -140,5 +140,29 @@ TEST_F(LexerTest, LogicalOr) {
   EXPECT_THAT(token->to_string(), StrEq("logical-or-operator"));
 }
 
+TEST_F(LexerTest, Equals) {
+  Lexer lexer{"examples/equals.sl"};
+  ASSERT_THAT(lexer.file_name(), StrEq("examples/equals.sl"));
+  bool success = lexer.scan();
+  ASSERT_TRUE(success);
+  const auto& tokens = lexer.tokens();
+  ASSERT_THAT(tokens.size(), Eq(1));
+  const auto& token = tokens[0];
+  EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
+  EXPECT_THAT(token->to_string(), StrEq("equals-operator"));
+}
+
+TEST_F(LexerTest, Assign) {
+  Lexer lexer{"examples/assign.sl"};
+  ASSERT_THAT(lexer.file_name(), StrEq("examples/assign.sl"));
+  bool success = lexer.scan();
+  ASSERT_TRUE(success);
+  const auto& tokens = lexer.tokens();
+  ASSERT_THAT(tokens.size(), Eq(1));
+  const auto& token = tokens[0];
+  EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
+  EXPECT_THAT(token->to_string(), StrEq("assign-operator"));
+}
+
 }  // namespace
 }  // namespace simp
