@@ -164,5 +164,17 @@ TEST_F(LexerTest, Assign) {
   EXPECT_THAT(token->to_string(), StrEq("assign-operator"));
 }
 
+TEST_F(LexerTest, Integer) {
+  Lexer lexer("examples/just_nums.sl");
+  ASSERT_THAT(lexer.file_name(), StrEq("examples/just_nums.sl"));
+  bool success = lexer.scan();
+  ASSERT_TRUE(success);
+  const auto& tokens = lexer.tokens();
+  ASSERT_THAT(tokens.size(), Eq(1));
+  const auto& token = tokens[0];
+  EXPECT_THAT(token->type(), Eq(TokenType::INTEGER));
+  EXPECT_THAT(token->to_string(), StrEq("1234567890"));
+}
+
 }  // namespace
 }  // namespace simp

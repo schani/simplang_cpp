@@ -101,7 +101,38 @@ bool Lexer::scan() {
                 Operator::ASSIGN, line, position, file_name()));
           }
           continue;
+        } else if (std::isdigit(c)) {
+          state = State::IN_INTEGER;
+          token += c;
+          continue;
+        } else if (std::isspace(c)) {
+          std::cout << "----isspace" << std::endl;
+          // ignore whitespace
+          if (c == '\n') {
+            line++;
+            position = 1;
+          } else {
+            position++;
+          }
         }
+        break;
+      }
+
+      case State::IN_INTEGER: {
+        if (std::isdigit(c)) {
+          token += c;
+          continue;
+        } else {
+          f.unget();
+
+          std::cout << "++++++++++++++++stoi(" << token << ")" << std::endl;
+          tokens_.push_back(std::make_unique<IntegerToken>(
+              std::stoi(token), line, position, file_name()));
+          state = State::START;
+          token = "";
+          continue;
+        }
+        break;
       }
       default:
         break;
