@@ -1,8 +1,9 @@
 cc_library(
   name = "tokens",
   hdrs = ["tokens.h"],
+  deps = [],
   copts = ["-std=c++20"],
-  visibility = ["//__subpackages__"],
+  visibility = [":__subpackages__"],
 )
 
 cc_test(

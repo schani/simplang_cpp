@@ -13,7 +13,7 @@ enum TokenType {
   OPERATOR,
 };
 
-std::map<std::string, std::string> Keywords = {
+inline std::map<std::string, std::string> Keywords = {
     {"let", "let-keyword"},     {"end", "end-keyword"},
     {"recur", "recur-keyword"}, {"if", "if-keyword"},
     {"then", "then-keyword"},   {"else", "else-keyword"},
@@ -87,6 +87,8 @@ class Token {
     return " in file:\"" + file_name_ + "\"\ton line:" + std::to_string(line_) +
            "\tat position:" + std::to_string(position_);
   }
+
+  /**************** Virtual methods******************/
   virtual std::string to_string() = 0;
   virtual void print() = 0;
   virtual ~Token() {}
@@ -140,9 +142,9 @@ class IntegerToken : public Token {
 };
 
 class KeywordToken : public Token {
-  public:
-   KeywordToken(std::string keyword, int line, int position,
-                                 std::string file_name)
+ public:
+  KeywordToken(std::string keyword, int line, int position,
+               std::string file_name)
       : Token(TokenType::KEYWORD, line, position, file_name),
         keyword_(keyword) {
     if (!is_valid_keyword(keyword_)) {
@@ -165,10 +167,10 @@ class KeywordToken : public Token {
 };
 
 class IdentifierToken : public Token {
-  public: 
+ public:
   IdentifierToken(std::string name, int line, int position,
-                        std::string file_name) : Token(TokenType::IDENTIFIER, line, position, file_name),
-        name_(name) {
+                  std::string file_name)
+      : Token(TokenType::IDENTIFIER, line, position, file_name), name_(name) {
     std::cout << "IdentifierToken(" << name_ << ") created" << std::endl;
   }
   std::string name() { return name_; }
@@ -176,11 +178,12 @@ class IdentifierToken : public Token {
   void print() override {
     std::cout << "IdentifierToken(" << name_ << ")" << location() << std::endl;
   }
+
   ~IdentifierToken() {
     std::cout << "IdentifierToken(" << name_ << ") destroyed" << std::endl;
   }
-  
-  private:
+
+ private:
   std::string name_;
 };
 
