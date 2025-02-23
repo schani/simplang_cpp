@@ -30,3 +30,14 @@
 *.exe
 *.out
 *.app
+*.dSYM
+
+# Bazel
+bazel-*
+MODULE.bazel.lock
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+examples
