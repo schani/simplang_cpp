@@ -37,6 +37,7 @@ bool Lexer::scan() {
   int line = 1;
   int position = 1;
   while (f.get(c)) {
+    position++;
     std::cout << "--while(c=->" << c << "<-)" << std::endl;
     switch (state) {
       case State::START: {
@@ -72,6 +73,7 @@ bool Lexer::scan() {
         } else if (c == '|') {
           if (f.peek() == '|') {
             f.get(c);
+            position++;
             tokens_.push_back(std::make_unique<OperatorToken>(
                 Operator::LOGICAL_OR, line, position, file_name()));
           } else {
@@ -83,6 +85,7 @@ bool Lexer::scan() {
         } else if (c == '&') {
           if (f.peek() == '&') {
             f.get(c);
+            position++;
             tokens_.push_back(std::make_unique<OperatorToken>(
                 Operator::LOGICAL_AND, line, position, file_name()));
           } else {
@@ -124,8 +127,8 @@ bool Lexer::scan() {
           continue;
         } else {
           f.unget();
+          position--;
 
-          std::cout << "++++++++++++++++stoi(" << token << ")" << std::endl;
           tokens_.push_back(std::make_unique<IntegerToken>(
               std::stoi(token), line, position, file_name()));
           state = State::START;
