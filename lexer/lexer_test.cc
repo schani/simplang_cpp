@@ -42,5 +42,17 @@ TEST_F(LexerTest, OpenParen) {
   EXPECT_THAT(token->to_string(), StrEq("open-paren-operator"));
 }
 
+TEST_F(LexerTest, CloseParen) {
+  Lexer lexer{"examples/close_paren.sl"};
+  ASSERT_THAT(lexer.file_name(), StrEq("examples/close_paren.sl"));
+  bool success = lexer.scan();
+  ASSERT_TRUE(success);
+  const auto& tokens = lexer.tokens();
+  ASSERT_THAT(tokens.size(), Eq(1));
+  const auto& token = tokens[0];
+  EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
+  EXPECT_THAT(token->to_string(), StrEq("close-paren-operator"));
+}
+
 }  // namespace
 }  // namespace simp

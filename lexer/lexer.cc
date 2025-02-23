@@ -44,6 +44,11 @@ bool Lexer::scan() {
         if (c == '(') {
           tokens_.push_back(std::make_unique<OperatorToken>(
               Operator::OPEN_PAREN, line, position, file_name()));
+          continue;
+        } else if (c == ')') {
+          tokens_.push_back(std::make_unique<OperatorToken>(
+              Operator::CLOSE_PAREN, line, position, file_name()));
+          continue;
         }
       }
       default:
