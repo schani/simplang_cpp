@@ -50,7 +50,7 @@ enum Operator {
 inline std::string op_to_string(Operator op) {
   switch (op) {
     case LOGICAL_OR:
-      return "or-operator";
+      return "logical-or-operator";
     case LOGICAL_AND:
       return "logical-and-operator";
     case NOT:

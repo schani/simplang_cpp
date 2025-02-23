@@ -69,6 +69,17 @@ bool Lexer::scan() {
           tokens_.push_back(std::make_unique<OperatorToken>(
               Operator::UNARY_MINUS, line, position, file_name()));
           continue;
+        } else if (c == '|') {
+          if (f.peek() == '|') {
+            f.get(c);
+            tokens_.push_back(std::make_unique<OperatorToken>(
+                Operator::LOGICAL_OR, line, position, file_name()));
+          } else {
+            std::cerr << "Error: expected || at line:" << line
+                      << " at position:" << position << std::endl;
+            return false;
+          }
+          continue;
         } else if (c == '&') {
           if (f.peek() == '&') {
             f.get(c);
