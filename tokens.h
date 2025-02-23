@@ -52,7 +52,7 @@ inline std::string op_to_string(Operator op) {
     case LOGICAL_OR:
       return "or-operator";
     case LOGICAL_AND:
-      return "and-operator";
+      return "logical-and-operator";
     case NOT:
       return "not-operator";
     case LESS_THAN:

@@ -114,5 +114,18 @@ TEST_F(LexerTest, LessThan) {
   EXPECT_THAT(token->to_string(), StrEq("less-than-operator"));
 }
 
+/************** Binary operators ********/
+TEST_F(LexerTest, LogicalAnd) {
+  Lexer lexer{"examples/logical_and.sl"};
+  ASSERT_THAT(lexer.file_name(), StrEq("examples/logical_and.sl"));
+  bool success = lexer.scan();
+  ASSERT_TRUE(success);
+  const auto& tokens = lexer.tokens();
+  ASSERT_THAT(tokens.size(), Eq(1));
+  const auto& token = tokens[0];
+  EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
+  EXPECT_THAT(token->to_string(), StrEq("logical-and-operator"));
+}
+
 }  // namespace
 }  // namespace simp
