@@ -49,6 +49,26 @@ bool Lexer::scan() {
           tokens_.push_back(std::make_unique<OperatorToken>(
               Operator::CLOSE_PAREN, line, position, file_name()));
           continue;
+        } else if (c == '+') {
+          tokens_.push_back(std::make_unique<OperatorToken>(
+              Operator::PLUS, line, position, file_name()));
+          continue;
+        } else if (c == '*') {
+          tokens_.push_back(std::make_unique<OperatorToken>(
+              Operator::TIMES, line, position, file_name()));
+          continue;
+        } else if (c == '!') {
+          tokens_.push_back(std::make_unique<OperatorToken>(
+              Operator::NOT, line, position, file_name()));
+          continue;
+        } else if (c == '<') {
+          tokens_.push_back(std::make_unique<OperatorToken>(
+              Operator::LESS_THAN, line, position, file_name()));
+          continue;
+        } else if (c == '-') {
+          tokens_.push_back(std::make_unique<OperatorToken>(
+              Operator::UNARY_MINUS, line, position, file_name()));
+          continue;
         }
       }
       default:

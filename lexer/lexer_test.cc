@@ -54,5 +54,65 @@ TEST_F(LexerTest, CloseParen) {
   EXPECT_THAT(token->to_string(), StrEq("close-paren-operator"));
 }
 
+TEST_F(LexerTest, Plus) {
+  Lexer lexer{"examples/plus.sl"};
+  ASSERT_THAT(lexer.file_name(), StrEq("examples/plus.sl"));
+  bool success = lexer.scan();
+  ASSERT_TRUE(success);
+  const auto& tokens = lexer.tokens();
+  ASSERT_THAT(tokens.size(), Eq(1));
+  const auto& token = tokens[0];
+  EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
+  EXPECT_THAT(token->to_string(), StrEq("plus-operator"));
+}
+
+TEST_F(LexerTest, Times) {
+  Lexer lexer{"examples/times.sl"};
+  ASSERT_THAT(lexer.file_name(), StrEq("examples/times.sl"));
+  bool success = lexer.scan();
+  ASSERT_TRUE(success);
+  const auto& tokens = lexer.tokens();
+  ASSERT_THAT(tokens.size(), Eq(1));
+  const auto& token = tokens[0];
+  EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
+  EXPECT_THAT(token->to_string(), StrEq("times-operator"));
+}
+
+TEST_F(LexerTest, UnaryMinus) {
+  Lexer lexer{"examples/unary_minus.sl"};
+  ASSERT_THAT(lexer.file_name(), StrEq("examples/unary_minus.sl"));
+  bool success = lexer.scan();
+  ASSERT_TRUE(success);
+  const auto& tokens = lexer.tokens();
+  ASSERT_THAT(tokens.size(), Eq(1));
+  const auto& token = tokens[0];
+  EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
+  EXPECT_THAT(token->to_string(), StrEq("unary-minus-operator"));
+}
+
+TEST_F(LexerTest, Not) {
+  Lexer lexer{"examples/not.sl"};
+  ASSERT_THAT(lexer.file_name(), StrEq("examples/not.sl"));
+  bool success = lexer.scan();
+  ASSERT_TRUE(success);
+  const auto& tokens = lexer.tokens();
+  ASSERT_THAT(tokens.size(), Eq(1));
+  const auto& token = tokens[0];
+  EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
+  EXPECT_THAT(token->to_string(), StrEq("not-operator"));
+}
+
+TEST_F(LexerTest, LessThan) {
+  Lexer lexer{"examples/less_than.sl"};
+  ASSERT_THAT(lexer.file_name(), StrEq("examples/less_than.sl"));
+  bool success = lexer.scan();
+  ASSERT_TRUE(success);
+  const auto& tokens = lexer.tokens();
+  ASSERT_THAT(tokens.size(), Eq(1));
+  const auto& token = tokens[0];
+  EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
+  EXPECT_THAT(token->to_string(), StrEq("less-than-operator"));
+}
+
 }  // namespace
 }  // namespace simp
