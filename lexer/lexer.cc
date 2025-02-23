@@ -11,7 +11,7 @@ using ::std::ifstream;
 using ::std::string;
 
 void handle_bad_file(std::ifstream& file) {
-  std::cout << "*******************Unable to open file*************";
+  std::cout << "*******************Unable to open file************\n";
   if (file.bad()) {
     std::cerr << "Fatal error: badbit is set." << std::endl;
   } else if (file.fail()) {
@@ -41,11 +41,16 @@ bool Lexer::scan() {
     switch (state) {
       case State::START: {
         std::cout << "----Start" << std::endl;
+        if (c == '(') {
+          tokens_.push_back(std::make_unique<OperatorToken>(
+              Operator::OPEN_PAREN, line, position, file_name()));
+        }
       }
       default:
         break;
     }
   }
+  return true;
 }
 
 }  // namespace simp

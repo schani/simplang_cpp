@@ -19,23 +19,27 @@ class LexerTest : public ::testing::Test {
   ~LexerTest() override {}
   void SetUp() override {}
 };
-// /************** Solo operators ********/
-// TEST_F(LexerTest, OpenParen) {
-//   Lexer lexer{"open_paren.sl"};
+
+// TEST_F(LexerTest, FailsToOpenNonExistentFile) {
+//   Lexer lexer{"non_existent_file.sl"};
+//   EXPECT_THAT(lexer.file_name(), StrEq("non_existent_file.sl"));
 //   bool success = lexer.scan();
-//   ASSERT_TRUE(success);
-//   const auto& tokens = lexer.tokens();
-//   // ASSERT_THAT(tokens.size(), Eq(1));
-//   // const auto& token = tokens[0];
-//   // EXPECT_THAT(token.type, Eq(TokenType::OPERATOR));
-//   // EXPECT_THAT(token.to_string(), StrEq("open-paren-operator"));
+//   ASSERT_FALSE(success);
+//   EXPECT_THAT(lexer.tokens().size(), Eq(0));
 // }
-TEST_F(LexerTest, FailsToOpenNonExistentFile) {
-  Lexer lexer{"non_existent_file.sl"};
-  EXPECT_THAT(lexer.file_name(), StrEq("non_existent_file.sl"));
+
+/************** Solo operators ********/
+
+TEST_F(LexerTest, OpenParen) {
+  Lexer lexer{"examples/open_paren.sl"};
+  ASSERT_THAT(lexer.file_name(), StrEq("examples/open_paren.sl"));
   bool success = lexer.scan();
-  ASSERT_FALSE(success);
-  EXPECT_THAT(lexer.tokens().size(), Eq(0));
+  ASSERT_TRUE(success);
+  const auto& tokens = lexer.tokens();
+  ASSERT_THAT(tokens.size(), Eq(1));
+  const auto& token = tokens[0];
+  EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
+  EXPECT_THAT(token->to_string(), StrEq("open-paren-operator"));
 }
 
 }  // namespace
