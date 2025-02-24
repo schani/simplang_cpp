@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include "tokens.h"
+#include "tokens/tokens.h"
 
 namespace simp {
 namespace {

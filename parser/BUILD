@@ -2,8 +2,8 @@ cc_library(
   name = "parser",
   srcs = ["parser.cc"],
   hdrs = ["parser.h"],
-  deps = ["//:tokens", "//lexer:lexer"],
-  visibility = [":__subpackages__"],
+  deps = ["//tokens:tokens", "//lexer:lexer"],
+  visibility = ["//:__subpackages__"],
 )
 
 cc_test(
@@ -12,7 +12,7 @@ cc_test(
     deps = [
         ":parser",
         "//lexer:lexer",
-        "//:tokens",
+        "//tokens:tokens",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],

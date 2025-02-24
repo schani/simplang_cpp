@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "tokens.h"
+#include "tokens/tokens.h"
 
 namespace simp {
 enum State {
