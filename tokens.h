@@ -24,6 +24,15 @@ inline bool is_valid_keyword(std::string keyword) {
   return Keywords.find(keyword) != Keywords.end();
 }
 
+inline bool is_keyword_prefix(const std::string& prefix) {
+  for (const auto& pair : Keywords) {
+    if (pair.first.rfind(prefix, 0) == 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
 inline std::string to_string(std::string keyword) {
   if (!is_valid_keyword(keyword)) {
     return "invalid-keyword";

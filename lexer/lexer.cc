@@ -117,6 +117,10 @@ bool Lexer::scan() {
           } else {
             position++;
           }
+        } else if (is_alpha(c)) {
+          token += c;
+          state = State::IN_KEYWORD;
+          continue;
         }
         break;
       }
@@ -137,11 +141,46 @@ bool Lexer::scan() {
         }
         break;
       }
+
+      case State::IN_KEYWORD: {
+        std::cout << "----In keyword token =(" << token << ") and char=(" << c
+                  << ")" << std::endl;
+        if (!is_keyword_prefix(token)) {
+          token += c;
+          state = State::IN_IDENTIFIER;
+          continue;
+        } else {
+          std::cout << "token before adding c=(" << token << ")" << std::endl;
+
+          token += c;
+          std::cout << "token after adding c=(" << token << ")" << std::endl;
+          if (f.peek() == EOF) {
+            tokens_.push_back(std::make_unique<KeywordToken>(
+                token, line, position, file_name()));
+          }
+          continue;
+        }
+        if (is_valid_keyword(token)) {
+          if (c == '_' || std::isalnum(c)) {
+            token += c;
+            state = State::IN_IDENTIFIER;
+            continue;
+          } else {
+            f.unget();
+            position--;
+            tokens_.push_back(std::make_unique<KeywordToken>(
+                token, line, position, file_name()));
+            state = State::START;
+            token = "";
+            continue;
+          }
+        }
+        break;
+      }
       default:
         break;
     }
   }
   return true;
 }
-
 }  // namespace simp

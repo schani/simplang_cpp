@@ -176,5 +176,21 @@ TEST_F(LexerTest, Integer) {
   EXPECT_THAT(token->to_string(), StrEq("1234567890"));
 }
 
+TEST_F(LexerTest, Keyword) {
+  for (const auto& pair : Keywords) {
+    std::string keyword = pair.first;
+    std::string file = "examples/" + keyword + "_keyword.sl";
+    Lexer lexer(file);
+    ASSERT_THAT(lexer.file_name(), StrEq(file));
+    bool success = lexer.scan();
+    ASSERT_TRUE(success);
+    const auto& tokens = lexer.tokens();
+    ASSERT_THAT(tokens.size(), Eq(1));
+    const auto& token = tokens[0];
+    EXPECT_THAT(token->type(), Eq(TokenType::KEYWORD));
+    EXPECT_THAT(token->to_string(), StrEq(keyword + "-keyword"));
+  };
+}
+
 }  // namespace
 }  // namespace simp
