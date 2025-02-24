@@ -38,10 +38,14 @@ bool Lexer::scan() {
   int position = 1;
   while (f.get(c)) {
     position++;
+#ifdef DEBUG
     std::cout << "--while(c=->" << c << "<-)" << std::endl;
+#endif
     switch (state) {
       case State::START: {
+#ifdef DEBUG
         std::cout << "----Start" << std::endl;
+#endif
         if (c == '(') {
           tokens_.push_back(std::make_unique<OperatorToken>(
               Operator::OPEN_PAREN, line, position, file_name()));
@@ -109,7 +113,9 @@ bool Lexer::scan() {
           token += c;
           continue;
         } else if (std::isspace(c)) {
+#ifdef DEBUG
           std::cout << "----isspace" << std::endl;
+#endif
           // ignore whitespace
           if (c == '\n') {
             line++;
