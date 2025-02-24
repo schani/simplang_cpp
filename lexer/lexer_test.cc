@@ -20,13 +20,13 @@ class LexerTest : public ::testing::Test {
   void SetUp() override {}
 };
 
-// TEST_F(LexerTest, FailsToOpenNonExistentFile) {
-//   Lexer lexer{"non_existent_file.sl"};
-//   EXPECT_THAT(lexer.file_name(), StrEq("non_existent_file.sl"));
-//   bool success = lexer.scan();
-//   ASSERT_FALSE(success);
-//   EXPECT_THAT(lexer.tokens().size(), Eq(0));
-// }
+TEST_F(LexerTest, FailsToOpenNonExistentFile) {
+  Lexer lexer{"non_existent_file.sl"};
+  EXPECT_THAT(lexer.file_name(), StrEq("non_existent_file.sl"));
+  bool success = lexer.scan();
+  ASSERT_FALSE(success);
+  EXPECT_THAT(lexer.tokens().size(), Eq(0));
+}
 
 /************** Solo operators ********/
 
@@ -202,6 +202,51 @@ TEST_F(LexerTest, Identifier) {
   const auto& token = tokens[0];
   EXPECT_THAT(token->type(), Eq(TokenType::IDENTIFIER));
   EXPECT_THAT(token->to_string(), StrEq("qwertyuiop_1234567890"));
+}
+
+TEST_F(LexerTest, Add) {
+  Lexer lexer("examples/add.sl");
+  ASSERT_THAT(lexer.file_name(), StrEq("examples/add.sl"));
+  bool success = lexer.scan();
+  ASSERT_TRUE(success);
+  const auto& tokens = lexer.tokens();
+  ASSERT_THAT(tokens.size(), Eq(9));
+  const auto& let_token = tokens[0];
+  EXPECT_THAT(let_token->type(), Eq(TokenType::KEYWORD));
+  EXPECT_THAT(let_token->to_string(), StrEq("let-keyword"));
+  const auto& main_token = tokens[1];
+  EXPECT_THAT(main_token->type(), Eq(TokenType::IDENTIFIER));
+  EXPECT_THAT(main_token->to_string(), StrEq("main"));
+  const auto& a_token = tokens[2];
+  EXPECT_THAT(a_token->type(), Eq(TokenType::IDENTIFIER));
+  EXPECT_THAT(a_token->to_string(), StrEq("a"));
+  const auto& b_token = tokens[3];
+  EXPECT_THAT(b_token->type(), Eq(TokenType::IDENTIFIER));
+  EXPECT_THAT(b_token->to_string(), StrEq("b"));
+  const auto& assign_token = tokens[4];
+  EXPECT_THAT(assign_token->type(), Eq(TokenType::OPERATOR));
+  EXPECT_THAT(assign_token->to_string(), StrEq("assign-operator"));
+  const auto& second_a_token = tokens[5];
+  EXPECT_THAT(second_a_token->type(), Eq(TokenType::IDENTIFIER));
+  EXPECT_THAT(second_a_token->to_string(), StrEq("a"));
+  const auto& plus_token = tokens[6];
+  EXPECT_THAT(plus_token->type(), Eq(TokenType::OPERATOR));
+  EXPECT_THAT(plus_token->to_string(), StrEq("plus-operator"));
+  const auto& second_b_token = tokens[7];
+  EXPECT_THAT(second_b_token->type(), Eq(TokenType::IDENTIFIER));
+  EXPECT_THAT(second_b_token->to_string(), StrEq("b"));
+  const auto& end_token = tokens[8];
+  EXPECT_THAT(end_token->type(), Eq(TokenType::KEYWORD));
+  EXPECT_THAT(end_token->to_string(), StrEq("end-keyword"));
+}
+
+TEST_F(LexerTest, ShiftL) {
+  Lexer lexer("examples/shiftl.sl");
+  ASSERT_THAT(lexer.file_name(), StrEq("examples/shiftl.sl"));
+  bool success = lexer.scan();
+  ASSERT_TRUE(success);
+  const auto& tokens = lexer.tokens();
+  ASSERT_THAT(tokens.size(), Eq(48));
 }
 
 }  // namespace

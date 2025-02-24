@@ -3,6 +3,7 @@ cc_library(
   srcs = ["lexer.cc"],
   hdrs = ["lexer.h"],
   deps = ["//:tokens"],
+  visibility = ["//:__subpackages__"],
 )
 
 cc_test(

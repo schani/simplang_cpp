@@ -5,13 +5,16 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+// #define DEBUG
 
 namespace simp {
 using ::std::ifstream;
 using ::std::string;
 
 void handle_bad_file(std::ifstream& file) {
+#ifdef DEBUG
   std::cout << "*******************Unable to open file************\n";
+#endif
   if (file.bad()) {
     std::cerr << "Fatal error: badbit is set." << std::endl;
   } else if (file.fail()) {
@@ -125,7 +128,11 @@ bool Lexer::scan() {
           }
         } else if (is_alpha(c)) {
           token += c;
-          state = State::IN_KEYWORD;
+          state = is_keyword_prefix(std::string(1, c)) ? State::IN_KEYWORD
+                                                       : State::IN_IDENTIFIER;
+#ifdef DEBUG
+          std::cout << "state Keyword " << std::endl;
+#endif
           continue;
         }
         break;
@@ -149,44 +156,55 @@ bool Lexer::scan() {
       }
 
       case State::IN_KEYWORD: {
-        if (!is_keyword_prefix(token)) {
-          token += c;
-          state = State::IN_IDENTIFIER;
+#ifdef DEBUG
+        std::cout << "In keyword. token (" << token << ") and c(" << c << ")"
+                  << std::endl;
+#endif
+
+        if (f.peek() == EOF) {
+          if (!std::isspace(c)) {
+            token += c;
+          }
+          if (is_valid_keyword(token)) {
+            tokens_.push_back(std::make_unique<KeywordToken>(
+                token, line, position, file_name()));
+          } else {
+            tokens_.push_back(std::make_unique<IdentifierToken>(
+                token, line, position, file_name()));
+          }
+        } else if (std::isspace(c) || std::isdigit(c) || is_operator(c)) {
+          f.unget();
+          position--;
+          if (is_valid_keyword(token)) {
+            tokens_.push_back(std::make_unique<KeywordToken>(
+                token, line, position, file_name()));
+          } else {
+            tokens_.push_back(std::make_unique<IdentifierToken>(
+                token, line, position, file_name()));
+          }
+          state = State::START;
+          token = "";
           continue;
         } else {
           token += c;
-          if (f.peek() == EOF) {
-            tokens_.push_back(std::make_unique<KeywordToken>(
-                token, line, position, file_name()));
-          }
           continue;
-        }
-        if (is_valid_keyword(token)) {
-          if (c == '_' || std::isalnum(c)) {
-            token += c;
-            state = State::IN_IDENTIFIER;
-            continue;
-          } else {
-            f.unget();
-            position--;
-            tokens_.push_back(std::make_unique<KeywordToken>(
-                token, line, position, file_name()));
-            state = State::START;
-            token = "";
-            continue;
-          }
         }
         break;
       }
+
       case State::IN_IDENTIFIER: {
+#ifdef DEBUG
+        std::cout << "In identifier. token (" << token << ") and c(" << c << ")"
+                  << std::endl;
+#endif
         if (c == '_' || std::isalnum(c)) {
           token += c;
-          if (f.peek() == EOF) {
+          if (f.peek() == EOF || std::isspace(c) || is_operator(c)) {
             tokens_.push_back(std::make_unique<IdentifierToken>(
                 token, line, position, file_name()));
           }
           continue;
-        } else {
+        } else if (std::isspace(c) || is_operator(c)) {
           f.unget();
           position--;
           tokens_.push_back(std::make_unique<IdentifierToken>(
