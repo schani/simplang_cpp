@@ -39,5 +39,11 @@ TEST_F(AstTest, CreatesIfExpression) {
   EXPECT_EQ(if_expr.eval(), 2);
 }
 
+TEST_F(AstTest, CreatesAst) {
+  std::unique_ptr<IntExpression> root = std::make_unique<IntExpression>(1);
+  Ast ast(std::move(root));
+  EXPECT_EQ(ast.root()->eval(), 1);
+}
+
 }  // namespace
 }  // namespace simp

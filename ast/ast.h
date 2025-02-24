@@ -89,4 +89,15 @@ class IfExpression : public Expression {
   std::unique_ptr<Expression> alternative_;
 };
 
+class Ast {
+ public:
+  Ast(std::unique_ptr<Expression> root) : root_(std::move(root)) {}
+  void print() { root_->print(); }
+  int eval() { return root_->eval(); }
+  std::unique_ptr<Expression>& root() { return root_; }
+
+ private:
+  std::unique_ptr<Expression> root_;
+};
+
 }  // namespace simp
