@@ -24,11 +24,10 @@ void handle_bad_file(std::ifstream& file) {
   }
 }
 
-bool is_alpha(char c) { return std::isalpha(c) || c == '_'; }
-
 bool Lexer::scan() {
+#ifdef DEBUG
   std::cout << "Scanning file: " << file_name() << std::endl;
-
+#endif
   std::ifstream f(file_name());
   if (!f.is_open()) {
     handle_bad_file(f);
@@ -36,187 +35,163 @@ bool Lexer::scan() {
   }
   char c;
   std::string token = "";
-  State state = State::START;
   int line = 1;
   int position = 1;
   while (f.get(c)) {
-    position++;
 #ifdef DEBUG
     std::cout << "--while(c=->" << c << "<-)" << std::endl;
 #endif
-    switch (state) {
-      case State::START: {
-#ifdef DEBUG
-        std::cout << "----Start" << std::endl;
-#endif
-        if (c == '(') {
-          tokens_.push_back(std::make_unique<OperatorToken>(
-              Operator::OPEN_PAREN, line, position, file_name()));
-          continue;
-        } else if (c == ')') {
-          tokens_.push_back(std::make_unique<OperatorToken>(
-              Operator::CLOSE_PAREN, line, position, file_name()));
-          continue;
-        } else if (c == '+') {
-          tokens_.push_back(std::make_unique<OperatorToken>(
-              Operator::PLUS, line, position, file_name()));
-          continue;
-        } else if (c == '*') {
-          tokens_.push_back(std::make_unique<OperatorToken>(
-              Operator::TIMES, line, position, file_name()));
-          continue;
-        } else if (c == '!') {
-          tokens_.push_back(std::make_unique<OperatorToken>(
-              Operator::NOT, line, position, file_name()));
-          continue;
-        } else if (c == '<') {
-          tokens_.push_back(std::make_unique<OperatorToken>(
-              Operator::LESS_THAN, line, position, file_name()));
-          continue;
-        } else if (c == '-') {
-          tokens_.push_back(std::make_unique<OperatorToken>(
-              Operator::UNARY_MINUS, line, position, file_name()));
-          continue;
-        } else if (c == '|') {
-          if (f.peek() == '|') {
-            f.get(c);
-            position++;
-            tokens_.push_back(std::make_unique<OperatorToken>(
-                Operator::LOGICAL_OR, line, position, file_name()));
-          } else {
-            std::cerr << "Error: expected || at line:" << line
-                      << " at position:" << position << std::endl;
-            return false;
-          }
-          continue;
-        } else if (c == '&') {
-          if (f.peek() == '&') {
-            f.get(c);
-            position++;
-            tokens_.push_back(std::make_unique<OperatorToken>(
-                Operator::LOGICAL_AND, line, position, file_name()));
-          } else {
-            std::cerr << "Error: expected && at line:" << line
-                      << " at position:" << position << std::endl;
-            return false;
-          }
-          continue;
-        } else if (c == '=') {
-          if (f.peek() == '=') {
-            f.get(c);
-            tokens_.push_back(std::make_unique<OperatorToken>(
-                Operator::EQUALS, line, position, file_name()));
-          } else {
-            tokens_.push_back(std::make_unique<OperatorToken>(
-                Operator::ASSIGN, line, position, file_name()));
-          }
-          continue;
-        } else if (std::isdigit(c)) {
-          state = State::IN_INTEGER;
-          token += c;
-          continue;
-        } else if (std::isspace(c)) {
-#ifdef DEBUG
-          std::cout << "----isspace" << std::endl;
-#endif
-          // ignore whitespace
-          if (c == '\n') {
-            line++;
-            position = 1;
-          } else {
-            position++;
-          }
-        } else if (is_alpha(c)) {
-          token += c;
-          state = is_keyword_prefix(std::string(1, c)) ? State::IN_KEYWORD
-                                                       : State::IN_IDENTIFIER;
-#ifdef DEBUG
-          std::cout << "state Keyword " << std::endl;
-#endif
-          continue;
-        }
-        break;
+    if (c == '(') {
+      tokens_.push_back(std::make_unique<OperatorToken>(
+          Operator::OPEN_PAREN, line, position, file_name()));
+      position++;
+      continue;
+    } else if (c == ')') {
+      tokens_.push_back(std::make_unique<OperatorToken>(
+          Operator::CLOSE_PAREN, line, position, file_name()));
+      position++;
+      continue;
+    } else if (c == '+') {
+      tokens_.push_back(std::make_unique<OperatorToken>(Operator::PLUS, line,
+                                                        position, file_name()));
+      position++;
+      continue;
+    } else if (c == '*') {
+      tokens_.push_back(std::make_unique<OperatorToken>(Operator::TIMES, line,
+                                                        position, file_name()));
+      position++;
+      continue;
+    } else if (c == '!') {
+      tokens_.push_back(std::make_unique<OperatorToken>(Operator::NOT, line,
+                                                        position, file_name()));
+      position++;
+      continue;
+    } else if (c == '<') {
+      tokens_.push_back(std::make_unique<OperatorToken>(
+          Operator::LESS_THAN, line, position, file_name()));
+      position++;
+      continue;
+    } else if (c == '-') {
+      tokens_.push_back(std::make_unique<OperatorToken>(
+          Operator::UNARY_MINUS, line, position, file_name()));
+      position++;
+      continue;
+    } else if (c == '|') {
+      if (f.peek() == '|') {
+        f.get(c);
+        position++;
+        tokens_.push_back(std::make_unique<OperatorToken>(
+            Operator::LOGICAL_OR, line, position, file_name()));
+        continue;
+      } else {
+        std::cerr << "Error: expected || at line:" << line
+                  << " at position:" << position << std::endl;
+        return false;
       }
-
-      case State::IN_INTEGER: {
-        if (std::isdigit(c)) {
-          token += c;
-          continue;
-        } else {
-          f.unget();
-          position--;
-
-          tokens_.push_back(std::make_unique<IntegerToken>(
-              std::stoi(token), line, position, file_name()));
-          state = State::START;
-          token = "";
-          continue;
-        }
-        break;
+      continue;
+    } else if (c == '&') {
+      if (f.peek() == '&') {
+        f.get(c);
+        position++;
+        tokens_.push_back(std::make_unique<OperatorToken>(
+            Operator::LOGICAL_AND, line, position, file_name()));
+        continue;
+      } else {
+        std::cerr << "Error: expected && at line:" << line
+                  << " at position:" << position << std::endl;
+        return false;
       }
-
-      case State::IN_KEYWORD: {
-#ifdef DEBUG
-        std::cout << "In keyword. token (" << token << ") and c(" << c << ")"
-                  << std::endl;
-#endif
-
-        if (f.peek() == EOF) {
-          if (!std::isspace(c)) {
-            token += c;
-          }
-          if (is_valid_keyword(token)) {
-            tokens_.push_back(std::make_unique<KeywordToken>(
-                token, line, position, file_name()));
-          } else {
-            tokens_.push_back(std::make_unique<IdentifierToken>(
-                token, line, position, file_name()));
-          }
-        } else if (std::isspace(c) || std::isdigit(c) || is_operator(c)) {
-          f.unget();
-          position--;
-          if (is_valid_keyword(token)) {
-            tokens_.push_back(std::make_unique<KeywordToken>(
-                token, line, position, file_name()));
-          } else {
-            tokens_.push_back(std::make_unique<IdentifierToken>(
-                token, line, position, file_name()));
-          }
-          state = State::START;
-          token = "";
-          continue;
-        } else {
-          token += c;
-          continue;
-        }
-        break;
+      continue;
+    } else if (c == '=') {
+      if (f.peek() == '=') {
+        f.get(c);
+        position++;
+        tokens_.push_back(std::make_unique<OperatorToken>(
+            Operator::EQUALS, line, position, file_name()));
+      } else {
+        tokens_.push_back(std::make_unique<OperatorToken>(
+            Operator::ASSIGN, line, position, file_name()));
       }
-
-      case State::IN_IDENTIFIER: {
+      continue;
+    } else if (std::isdigit(c)) {
+      token += c;
+      position++;
+      while (f.get(c) && std::isdigit(c)) {
+        token += c;
+        position++;
+      }
+      if (!std::isdigit(c)) {
+        f.unget();
+        position--;
+        tokens_.push_back(std::make_unique<IntegerToken>(
+            std::stoi(token), line, position - token.length(), file_name()));
+        token = "";
+        continue;
+      }
+    } else if (std::isspace(c)) {
 #ifdef DEBUG
-        std::cout << "In identifier. token (" << token << ") and c(" << c << ")"
-                  << std::endl;
+      std::cout << "----isspace" << std::endl;
 #endif
-        if (c == '_' || std::isalnum(c)) {
+      // ignore whitespace
+      if (c == '\n') {
+        line++;
+        position = 1;
+      } else {
+        position++;
+      }
+    } else if (c == '_') {
+      if (!std::isalpha(f.peek())) {
+        std::cerr << "Error: expected identifier at line:" << line
+                  << " at position:" << position << std::endl;
+        return false;
+      } else {
+        token += c;
+        while (f.get(c) && (std::isalnum(c) || c == '_')) {
           token += c;
-          if (f.peek() == EOF || std::isspace(c) || is_operator(c)) {
-            tokens_.push_back(std::make_unique<IdentifierToken>(
-                token, line, position, file_name()));
-          }
-          continue;
-        } else if (std::isspace(c) || is_operator(c)) {
+        }
+        if (std::isalnum(c) && c != '_') {
           f.unget();
           position--;
           tokens_.push_back(std::make_unique<IdentifierToken>(
-              token, line, position, file_name()));
-          state = State::START;
+              token, line, position - token.length(), file_name()));
           token = "";
           continue;
         }
-        break;
+      }
+    } else if (std::isalpha(c)) {
+      token += c;
+      while (f.get(c) && (std::isalnum(c) || c == '_')) {
+        token += c;
+      }
+      if (std::isspace(c) || f.peek() == EOF) {
+        f.unget();
+        position--;
+        if (is_valid_keyword(token)) {
+          tokens_.push_back(std::make_unique<KeywordToken>(
+              token, line, position - token.length(), file_name()));
+        } else {
+          tokens_.push_back(std::make_unique<IdentifierToken>(
+              token, line, position - token.length(), file_name()));
+        }
+        token = "";
+        continue;
+      }
+      if (!std::isalnum(c) && c != '_') {
+        f.unget();
+        position--;
+        if (is_valid_keyword(token)) {
+          tokens_.push_back(std::make_unique<KeywordToken>(
+              token, line, position - token.length(), file_name()));
+        } else {
+          tokens_.push_back(std::make_unique<IdentifierToken>(
+              token, line, position - token.length(), file_name()));
+        }
+        token = "";
+        continue;
       }
     }
   }
   return true;
 }
+
 }  // namespace simp
