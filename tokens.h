@@ -18,6 +18,7 @@ inline std::map<std::string, std::string> Keywords = {
     {"recur", "recur-keyword"}, {"if", "if-keyword"},
     {"then", "then-keyword"},   {"else", "else-keyword"},
     {"in", "in-keyword"},       {"and", "and-keyword"},
+    {"loop", "loop-keyword"},
 };
 
 inline bool is_valid_keyword(std::string keyword) {
@@ -83,6 +84,11 @@ inline std::string op_to_string(Operator op) {
   }
 }
 
+inline std::string operators = "+-*(=)&|!";
+inline bool is_operator(char c) {
+  return operators.find(c) != std::string::npos;
+}
+
 class Token {
  public:
   Token(TokenType type, int line, int position, std::string file_name)
@@ -113,7 +119,8 @@ class OperatorToken : public Token {
  public:
   OperatorToken(Operator op, int line, int position, std::string file_name)
       : Token(TokenType::OPERATOR, line, position, file_name), op_(op) {
-    std::cout << "OperatorToken created" << std::endl;
+    std::cout << "(" << op_to_string(op) << ")" << "OperatorToken created"
+              << std::endl;
   }
   Operator op() { return op_; }
   std::string to_string() override { return op_to_string(op_); }
