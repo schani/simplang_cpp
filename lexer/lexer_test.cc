@@ -192,5 +192,17 @@ TEST_F(LexerTest, Keyword) {
   };
 }
 
+TEST_F(LexerTest, Identifier) {
+  Lexer lexer("examples/identifier.sl");
+  ASSERT_THAT(lexer.file_name(), StrEq("examples/identifier.sl"));
+  bool success = lexer.scan();
+  ASSERT_TRUE(success);
+  const auto& tokens = lexer.tokens();
+  ASSERT_THAT(tokens.size(), Eq(1));
+  const auto& token = tokens[0];
+  EXPECT_THAT(token->type(), Eq(TokenType::IDENTIFIER));
+  EXPECT_THAT(token->to_string(), StrEq("qwertyuiop_1234567890"));
+}
+
 }  // namespace
 }  // namespace simp

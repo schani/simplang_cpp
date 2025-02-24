@@ -143,17 +143,12 @@ bool Lexer::scan() {
       }
 
       case State::IN_KEYWORD: {
-        std::cout << "----In keyword token =(" << token << ") and char=(" << c
-                  << ")" << std::endl;
         if (!is_keyword_prefix(token)) {
           token += c;
           state = State::IN_IDENTIFIER;
           continue;
         } else {
-          std::cout << "token before adding c=(" << token << ")" << std::endl;
-
           token += c;
-          std::cout << "token after adding c=(" << token << ")" << std::endl;
           if (f.peek() == EOF) {
             tokens_.push_back(std::make_unique<KeywordToken>(
                 token, line, position, file_name()));
@@ -177,8 +172,25 @@ bool Lexer::scan() {
         }
         break;
       }
-      default:
+      case State::IN_IDENTIFIER: {
+        if (c == '_' || std::isalnum(c)) {
+          token += c;
+          if (f.peek() == EOF) {
+            tokens_.push_back(std::make_unique<IdentifierToken>(
+                token, line, position, file_name()));
+          }
+          continue;
+        } else {
+          f.unget();
+          position--;
+          tokens_.push_back(std::make_unique<IdentifierToken>(
+              token, line, position, file_name()));
+          state = State::START;
+          token = "";
+          continue;
+        }
         break;
+      }
     }
   }
   return true;
