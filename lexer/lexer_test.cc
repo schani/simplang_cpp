@@ -28,16 +28,16 @@ TEST_F(LexerTest, FailsToOpenNonExistentFile) {
   EXPECT_THAT(lexer.tokens().size(), Eq(0));
 }
 
-/************** Solo operators ********/
+// /************** Solo operators ********/
 
 TEST_F(LexerTest, OpenParen) {
   Lexer lexer{"examples/open_paren.sl"};
   ASSERT_THAT(lexer.file_name(), StrEq("examples/open_paren.sl"));
   bool success = lexer.scan();
   ASSERT_TRUE(success);
-  const auto& tokens = lexer.tokens();
+  auto& tokens = lexer.tokens();
   ASSERT_THAT(tokens.size(), Eq(1));
-  const auto& token = tokens[0];
+  auto token = std::move(std::move(tokens.front()));
   EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
   EXPECT_THAT(token->to_string(), StrEq("open-paren-operator"));
 }
@@ -47,9 +47,9 @@ TEST_F(LexerTest, CloseParen) {
   ASSERT_THAT(lexer.file_name(), StrEq("examples/close_paren.sl"));
   bool success = lexer.scan();
   ASSERT_TRUE(success);
-  const auto& tokens = lexer.tokens();
+  auto& tokens = lexer.tokens();
   ASSERT_THAT(tokens.size(), Eq(1));
-  const auto& token = tokens[0];
+  auto token = std::move(tokens.front());
   EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
   EXPECT_THAT(token->to_string(), StrEq("close-paren-operator"));
 }
@@ -59,9 +59,9 @@ TEST_F(LexerTest, Plus) {
   ASSERT_THAT(lexer.file_name(), StrEq("examples/plus.sl"));
   bool success = lexer.scan();
   ASSERT_TRUE(success);
-  const auto& tokens = lexer.tokens();
+  auto& tokens = lexer.tokens();
   ASSERT_THAT(tokens.size(), Eq(1));
-  const auto& token = tokens[0];
+  auto token = std::move(tokens.front());
   EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
   EXPECT_THAT(token->to_string(), StrEq("plus-operator"));
 }
@@ -71,9 +71,9 @@ TEST_F(LexerTest, Times) {
   ASSERT_THAT(lexer.file_name(), StrEq("examples/times.sl"));
   bool success = lexer.scan();
   ASSERT_TRUE(success);
-  const auto& tokens = lexer.tokens();
+  auto& tokens = lexer.tokens();
   ASSERT_THAT(tokens.size(), Eq(1));
-  const auto& token = tokens[0];
+  auto token = std::move(tokens.front());
   EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
   EXPECT_THAT(token->to_string(), StrEq("times-operator"));
 }
@@ -83,9 +83,9 @@ TEST_F(LexerTest, UnaryMinus) {
   ASSERT_THAT(lexer.file_name(), StrEq("examples/unary_minus.sl"));
   bool success = lexer.scan();
   ASSERT_TRUE(success);
-  const auto& tokens = lexer.tokens();
+  auto& tokens = lexer.tokens();
   ASSERT_THAT(tokens.size(), Eq(1));
-  const auto& token = tokens[0];
+  auto token = std::move(tokens.front());
   EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
   EXPECT_THAT(token->to_string(), StrEq("unary-minus-operator"));
 }
@@ -95,9 +95,9 @@ TEST_F(LexerTest, Not) {
   ASSERT_THAT(lexer.file_name(), StrEq("examples/not.sl"));
   bool success = lexer.scan();
   ASSERT_TRUE(success);
-  const auto& tokens = lexer.tokens();
+  auto& tokens = lexer.tokens();
   ASSERT_THAT(tokens.size(), Eq(1));
-  const auto& token = tokens[0];
+  auto token = std::move(tokens.front());
   EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
   EXPECT_THAT(token->to_string(), StrEq("not-operator"));
 }
@@ -107,23 +107,23 @@ TEST_F(LexerTest, LessThan) {
   ASSERT_THAT(lexer.file_name(), StrEq("examples/less_than.sl"));
   bool success = lexer.scan();
   ASSERT_TRUE(success);
-  const auto& tokens = lexer.tokens();
+  auto& tokens = lexer.tokens();
   ASSERT_THAT(tokens.size(), Eq(1));
-  const auto& token = tokens[0];
+  auto token = std::move(tokens.front());
   EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
   EXPECT_THAT(token->to_string(), StrEq("less-than-operator"));
 }
 
-/************** Binary operators ********/
+// /************** Binary operators ********/
 
 TEST_F(LexerTest, LogicalAnd) {
   Lexer lexer{"examples/logical_and.sl"};
   ASSERT_THAT(lexer.file_name(), StrEq("examples/logical_and.sl"));
   bool success = lexer.scan();
   ASSERT_TRUE(success);
-  const auto& tokens = lexer.tokens();
+  auto& tokens = lexer.tokens();
   ASSERT_THAT(tokens.size(), Eq(1));
-  const auto& token = tokens[0];
+  auto token = std::move(tokens.front());
   EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
   EXPECT_THAT(token->to_string(), StrEq("logical-and-operator"));
 }
@@ -133,9 +133,9 @@ TEST_F(LexerTest, LogicalOr) {
   ASSERT_THAT(lexer.file_name(), StrEq("examples/logical_or.sl"));
   bool success = lexer.scan();
   ASSERT_TRUE(success);
-  const auto& tokens = lexer.tokens();
+  auto& tokens = lexer.tokens();
   ASSERT_THAT(tokens.size(), Eq(1));
-  const auto& token = tokens[0];
+  auto token = std::move(tokens.front());
   EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
   EXPECT_THAT(token->to_string(), StrEq("logical-or-operator"));
 }
@@ -145,9 +145,9 @@ TEST_F(LexerTest, Equals) {
   ASSERT_THAT(lexer.file_name(), StrEq("examples/equals.sl"));
   bool success = lexer.scan();
   ASSERT_TRUE(success);
-  const auto& tokens = lexer.tokens();
+  auto& tokens = lexer.tokens();
   ASSERT_THAT(tokens.size(), Eq(1));
-  const auto& token = tokens[0];
+  auto token = std::move(tokens.front());
   EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
   EXPECT_THAT(token->to_string(), StrEq("equals-operator"));
 }
@@ -157,9 +157,9 @@ TEST_F(LexerTest, Assign) {
   ASSERT_THAT(lexer.file_name(), StrEq("examples/assign.sl"));
   bool success = lexer.scan();
   ASSERT_TRUE(success);
-  const auto& tokens = lexer.tokens();
+  auto& tokens = lexer.tokens();
   ASSERT_THAT(tokens.size(), Eq(1));
-  const auto& token = tokens[0];
+  auto token = std::move(tokens.front());
   EXPECT_THAT(token->type(), Eq(TokenType::OPERATOR));
   EXPECT_THAT(token->to_string(), StrEq("assign-operator"));
 }
@@ -169,9 +169,9 @@ TEST_F(LexerTest, Integer) {
   ASSERT_THAT(lexer.file_name(), StrEq("examples/just_nums.sl"));
   bool success = lexer.scan();
   ASSERT_TRUE(success);
-  const auto& tokens = lexer.tokens();
+  auto& tokens = lexer.tokens();
   ASSERT_THAT(tokens.size(), Eq(1));
-  const auto& token = tokens[0];
+  auto token = std::move(tokens.front());
   EXPECT_THAT(token->type(), Eq(TokenType::INTEGER));
   EXPECT_THAT(token->to_string(), StrEq("1234567890"));
 }
@@ -184,9 +184,9 @@ TEST_F(LexerTest, Keyword) {
     ASSERT_THAT(lexer.file_name(), StrEq(file));
     bool success = lexer.scan();
     ASSERT_TRUE(success);
-    const auto& tokens = lexer.tokens();
+    auto& tokens = lexer.tokens();
     ASSERT_THAT(tokens.size(), Eq(1));
-    const auto& token = tokens[0];
+    auto token = std::move(tokens.front());
     EXPECT_THAT(token->type(), Eq(TokenType::KEYWORD));
     EXPECT_THAT(token->to_string(), StrEq(keyword + "-keyword"));
   };
@@ -197,9 +197,9 @@ TEST_F(LexerTest, Identifier) {
   ASSERT_THAT(lexer.file_name(), StrEq("examples/identifier.sl"));
   bool success = lexer.scan();
   ASSERT_TRUE(success);
-  const auto& tokens = lexer.tokens();
+  auto& tokens = lexer.tokens();
   ASSERT_THAT(tokens.size(), Eq(1));
-  const auto& token = tokens[0];
+  auto token = std::move(tokens.front());
   EXPECT_THAT(token->type(), Eq(TokenType::IDENTIFIER));
   EXPECT_THAT(token->to_string(), StrEq("qwertyuiop_1234567890"));
 }
@@ -209,33 +209,41 @@ TEST_F(LexerTest, Add) {
   ASSERT_THAT(lexer.file_name(), StrEq("examples/add.sl"));
   bool success = lexer.scan();
   ASSERT_TRUE(success);
-  const auto& tokens = lexer.tokens();
+  auto& tokens = lexer.tokens();
   ASSERT_THAT(tokens.size(), Eq(9));
-  const auto& let_token = tokens[0];
+  auto let_token = std::move(tokens.front());
   EXPECT_THAT(let_token->type(), Eq(TokenType::KEYWORD));
   EXPECT_THAT(let_token->to_string(), StrEq("let-keyword"));
-  const auto& main_token = tokens[1];
+  tokens.pop();
+  auto main_token = std::move(tokens.front());
   EXPECT_THAT(main_token->type(), Eq(TokenType::IDENTIFIER));
   EXPECT_THAT(main_token->to_string(), StrEq("main"));
-  const auto& a_token = tokens[2];
+  tokens.pop();
+  auto a_token = std::move(tokens.front());
   EXPECT_THAT(a_token->type(), Eq(TokenType::IDENTIFIER));
   EXPECT_THAT(a_token->to_string(), StrEq("a"));
-  const auto& b_token = tokens[3];
+  tokens.pop();
+  auto b_token = std::move(tokens.front());
   EXPECT_THAT(b_token->type(), Eq(TokenType::IDENTIFIER));
   EXPECT_THAT(b_token->to_string(), StrEq("b"));
-  const auto& assign_token = tokens[4];
+  tokens.pop();
+  auto assign_token = std::move(tokens.front());
   EXPECT_THAT(assign_token->type(), Eq(TokenType::OPERATOR));
   EXPECT_THAT(assign_token->to_string(), StrEq("assign-operator"));
-  const auto& second_a_token = tokens[5];
+  tokens.pop();
+  auto second_a_token = std::move(tokens.front());
   EXPECT_THAT(second_a_token->type(), Eq(TokenType::IDENTIFIER));
   EXPECT_THAT(second_a_token->to_string(), StrEq("a"));
-  const auto& plus_token = tokens[6];
+  tokens.pop();
+  auto plus_token = std::move(tokens.front());
   EXPECT_THAT(plus_token->type(), Eq(TokenType::OPERATOR));
   EXPECT_THAT(plus_token->to_string(), StrEq("plus-operator"));
-  const auto& second_b_token = tokens[7];
+  tokens.pop();
+  auto second_b_token = std::move(tokens.front());
   EXPECT_THAT(second_b_token->type(), Eq(TokenType::IDENTIFIER));
   EXPECT_THAT(second_b_token->to_string(), StrEq("b"));
-  const auto& end_token = tokens[8];
+  tokens.pop();
+  auto end_token = std::move(tokens.front());
   EXPECT_THAT(end_token->type(), Eq(TokenType::KEYWORD));
   EXPECT_THAT(end_token->to_string(), StrEq("end-keyword"));
 }
@@ -245,7 +253,7 @@ TEST_F(LexerTest, ShiftL) {
   ASSERT_THAT(lexer.file_name(), StrEq("examples/shiftl.sl"));
   bool success = lexer.scan();
   ASSERT_TRUE(success);
-  const auto& tokens = lexer.tokens();
+  auto& tokens = lexer.tokens();
   ASSERT_THAT(tokens.size(), Eq(48));
 }
 
