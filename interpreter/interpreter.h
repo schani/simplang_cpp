@@ -10,8 +10,10 @@ class Interpreter {
  public:
   Interpreter(const std::string& source) : source_(source) {
     lexer_ = Lexer(source);
+    lexer_.scan();
     parser_ = Parser(lexer_.tokens());
-    ast_ = Ast(std::move(parser_.parse()));
+    parser_.parse();
+    ast_ = std::move(parser_.ast());
   }
   const std::string& source() const { return source_; }
   Lexer& lexer() { return lexer_; }

@@ -2,7 +2,11 @@ cc_library(
   name = "parser",
   srcs = ["parser.cc"],
   hdrs = ["parser.h"],
-  deps = ["//tokens:tokens", "//lexer:lexer"],
+  deps = [
+    "//ast:ast",
+     "//lexer:lexer",
+    "//tokens:tokens",
+     ],
   visibility = ["//:__subpackages__"],
 )
 

@@ -8,6 +8,7 @@ namespace simp {
 enum class ExpressionType {
   INTEGER,
   IF,
+  BINARY,
   // IN,
   // LET,
   // PLUS,
@@ -87,6 +88,21 @@ class IfExpression : public Expression {
   std::unique_ptr<Expression> condition_;
   std::unique_ptr<Expression> consequent_;
   std::unique_ptr<Expression> alternative_;
+};
+
+class BinaryExpression : public Expression {
+ public:
+  BinaryExpression(std::unique_ptr<Expression> left,
+                   std::unique_ptr<Expression> right, const std::string& op)
+      : Expression(ExpressionType::IF),
+        left_(std::move(left)),
+        right_(std::move(right)),
+        op_(op) {}
+
+ private:
+  std::unique_ptr<Expression> left_;
+  std::unique_ptr<Expression> right_;
+  std::string op_;
 };
 
 class Ast {
