@@ -13,7 +13,8 @@ class Parser {
   bool parse();
   std::unique_ptr<Expression> parse_primary_expression();
   std::unique_ptr<Expression> parse_binary_expression();
-  std::unique_ptr<Ast> ast() { return ast_; }
+  // TODO: check if move needed.
+  std::unique_ptr<Ast> ast() { return std::move(ast_); }
 
  private:
   std::queue<std::unique_ptr<Token>> tokens_;

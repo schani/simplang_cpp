@@ -122,6 +122,15 @@ class OperatorToken : public Token {
     std::cout << "(" << op_to_string(op) << ")" << "OperatorToken created"
               << std::endl;
   }
+
+  OperatorToken(OperatorToken* op_token)
+      : Token(TokenType::OPERATOR, op_token->line(), op_token->position(),
+              op_token->file_name()),
+        op_(op_token->op()) {
+    std::cout << "(" << op_to_string(op_) << ")" << "OperatorToken created"
+              << std::endl;
+  }
+
   Operator op() { return op_; }
   std::string to_string() override { return op_to_string(op_); }
   void print() override {
@@ -169,6 +178,18 @@ class KeywordToken : public Token {
       std::cout << "(" << keyword << ") KeywordToken created" << std::endl;
     }
   }
+
+  KeywordToken(KeywordToken* keyword_token)
+      : Token(TokenType::KEYWORD, keyword_token->line(),
+              keyword_token->position(), keyword_token->file_name()),
+        keyword_(keyword_token->keyword()) {
+    if (!is_valid_keyword(keyword_)) {
+      throw std::runtime_error("Invalid keyword");
+    } else {
+      std::cout << "(" << keyword_ << ") KeywordToken created" << std::endl;
+    }
+  }
+
   std::string keyword() { return keyword_; }
   std::string to_string() override { return Keywords[keyword_]; }
   void print() override {

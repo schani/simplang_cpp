@@ -99,6 +99,12 @@ class BinaryExpression : public Expression {
         right_(std::move(right)),
         op_(op) {}
 
+  std::string to_string() override {
+    return "BinaryExpression\nleft:" + left_->to_string() +
+           "\nright:" + right_->to_string() + "\nop:" + op_;
+  }
+  void print() override { std::cout << to_string() << std::endl; }
+
  private:
   std::unique_ptr<Expression> left_;
   std::unique_ptr<Expression> right_;
