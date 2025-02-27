@@ -10,33 +10,39 @@ std::unique_ptr<KeywordToken> Parser::expect_keyword(
     const std::string& keyword) {
   std::unique_ptr<Token> token = std::move(tokens_.front());
   if (!token) {
-    std::cout << "----------expect_keyword No token found" << std::endl;
+#ifdef DEBUG
+    std::cout << "----------expect_keyword No token found. token == nullptr:"
+              << (token == nullptr) << std::endl;
+#endif
     return nullptr;
   }
   if (token->type() == TokenType::KEYWORD) {
+#ifdef DEBUG
+    std::cout << "----------expect_keyword Keyword found" << std::endl;
+#endif
     const auto& keyword_token = static_cast<KeywordToken*>(token.get());
-    std::cout << "----------expect_keyword Eactual keyword:"
-              << keyword_token->keyword() << std::endl;
+
     if (keyword_token->keyword() == keyword) {
-      tokens_.pop();
+      tokens_.pop_front();
       return std::make_unique<KeywordToken>(keyword_token);
     }
   }
-  std::cout << "----------expect_keyword keyword not found" << std::endl;
   return nullptr;
 }
 
 std::unique_ptr<OperatorToken> Parser::expect_operator() {
   std::unique_ptr<Token> token = std::move(tokens_.front());
-  tokens_.pop();
+  tokens_.pop_front();
   if (token->type() != TokenType::OPERATOR) {
-    tokens_.push(std::move(token));
-    std::cout << "----------expect_operator operator not found" << std::endl;
+    tokens_.push_front(std::move(
+        token));  // needs to be pushed to the front for the algorithm to work.
     return nullptr;
   }
-  std::cout << "----------expect_operator operator found" << std::endl;
+#ifdef DEBUG
+  std::cout << "----------expect_operator: operator found" << std::endl;
+#endif
   const auto& operator_token = static_cast<OperatorToken*>(token.get());
-  tokens_.pop();
+  tokens_.pop_front();
   return std::make_unique<OperatorToken>(operator_token);
 }
 
@@ -74,7 +80,7 @@ std::unique_ptr<Expression> Parser::parse_primary_expression() {
   }
 
   auto token = std::move(tokens_.front());
-  tokens_.pop();
+  tokens_.pop_front();
 #ifdef DEBUG
   std::cout << "-------primary popped token and have " << tokens_.size()
             << " tokens left before if statements" << std::endl;
@@ -94,23 +100,11 @@ std::unique_ptr<Expression> Parser::parse_primary_expression() {
     auto keyword_token = std::make_unique<KeywordToken>(keyword_token_ptr);
 
     if (keyword_token->keyword() == "if") {
-#ifdef DEBUG
-      std::cout << tokens_.size() << " tokens left before parsing condition"
-                << std::endl;
-#endif
       auto condtion = parse_binary_expression();
-      std::cout
-          << tokens_.size()
-          << " tokens left after parsing condition before the expect keyword"
-          << std::endl;
       auto then_token = expect_keyword("then");
-      std::cout
-          << tokens_.size()
-          << " tokens left after parsing condition after the expect keyword"
-          << std::endl;
       if (!then_token) {
 #ifdef DEBUG
-        std::cout << "Then token not found in if statenent" << std::endl;
+        std::cout << "Token not found in if statenent" << std::endl;
 #endif
         return nullptr;
       }
@@ -137,38 +131,24 @@ std::unique_ptr<Expression> Parser::parse_primary_expression() {
 #endif
         return nullptr;
       }
+      auto end_token = expect_keyword("end");
+      if (!end_token) {
 #ifdef DEBUG
-      std::cout << "If expression parsed successfully" << std::endl;
+        std::cout << "End token not found in if statenent" << std::endl;
 #endif
+        return nullptr;
+      }
       return std::make_unique<IfExpression>(
           std::move(keyword_token), std::move(condtion), std::move(then_token),
-          std::move(consequent), std::move(else_token), std::move(alternative));
+          std::move(consequent), std::move(else_token), std::move(alternative),
+          std::move(end_token));
 #ifdef DEBUG
-      std::cout << "Expression not recognized" << std::endl;
 #endif
-      // auto alternative = parse_binary_expression();
-      // return std::make_unique<IfExpression>(
-      //     std::move(keyword_token), std::move(condtion),
-      //     std::move(then_token), std::move(consequent),
-      //     std::move(else_token), std::move(alternative));
     }
-  }  // else if keyword
+  }
+  std::cout << "Expression not recognized" << std::endl;
   return nullptr;
 }
-
-// } else if (keyword_token_ptr->keyword() == "let") {
-// auto& identifier = expect_identifier();
-// auto& assign = expect_operator();
-// auto& expression = parse_binary_expression();
-// auto& in = expect_keyword("in");
-// auto& body = parse_binary_expression();
-// return std::make_unique<LetExpression>(
-//     std::move(identifier), std::move(expression), std::move(body));
-// #ifdef DEBUG
-// std::cout << "Expression not recognized" << std::endl;
-// #endif
-// return nullptr;
-// }
 
 std::unique_ptr<Expression> Parser::parse_binary_expression() {
 #ifdef DEBUG
@@ -179,12 +159,7 @@ std::unique_ptr<Expression> Parser::parse_binary_expression() {
   if (!left) {
     return nullptr;
   }
-#ifdef DEBUG
-  std::cout << "-------binary left expression to_string:" << left->to_string()
-            << std::endl;
-#endif
-  std::cout << "________________________________________before then destroyed"
-            << std::endl;
+
   if (tokens_.size() == 0) {
     return left;
   }
@@ -196,14 +171,14 @@ std::unique_ptr<Expression> Parser::parse_binary_expression() {
 #endif
     return left;
   }
-#ifdef DEBUG
-  std::cout << "-------binary Parse binary operator:" << op->to_string()
-            << std::endl;
-#endif
+
   const auto& operator_token = static_cast<OperatorToken*>(op.get());
   auto right = parse_binary_expression();
   if (!right) {
-    std::cerr << "Failed to parse right expression" << std::endl;
+#ifdef DEBUG
+    std::cerr << "Found operator but failed to parse right expression"
+              << std::endl;
+#endif
     return nullptr;
   }
   return std::make_unique<BinaryExpression>(std::move(left), std::move(right),

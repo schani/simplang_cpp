@@ -1,7 +1,7 @@
 #pragma once
 
+#include <deque>
 #include <memory>
-#include <queue>
 #include <string>
 
 #include "tokens/tokens.h"
@@ -18,12 +18,12 @@ class Lexer {
   Lexer(const std::string& file_name) : file_name_(file_name) {}
 
   bool scan();
-  std::queue<std::unique_ptr<Token>>& tokens() { return tokens_; }
+  std::deque<std::unique_ptr<Token>>& tokens() { return tokens_; }
   const std::string& file_name() const { return file_name_; }
 
  private:
   const std::string file_name_;
-  std::queue<std::unique_ptr<Token>> tokens_;
+  std::deque<std::unique_ptr<Token>> tokens_;
 };
 
 }  // namespace simp

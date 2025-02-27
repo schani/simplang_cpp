@@ -52,14 +52,16 @@ class IfExpression : public Expression {
                std::unique_ptr<KeywordToken> then_token,
                std::unique_ptr<Expression> consequent,
                std::unique_ptr<KeywordToken> else_token,
-               std::unique_ptr<Expression> alternative)
+               std::unique_ptr<Expression> alternative,
+               std::unique_ptr<KeywordToken> end_token)
       : Expression(ExpressionType::IF),
         if_token_(std::move(if_token)),
         condition_(std::move(condition)),
         then_token_(std::move(then_token)),
         consequent_(std::move(consequent)),
         else_token_(std::move(else_token)),
-        alternative_(std::move(alternative)) {}
+        alternative_(std::move(alternative)),
+        end_token_(std::move(end_token)) {}
 
   std::unique_ptr<KeywordToken>& if_token() { return if_token_; }
   std::unique_ptr<KeywordToken>& then_token() { return then_token_; }
@@ -67,6 +69,7 @@ class IfExpression : public Expression {
   std::unique_ptr<Expression>& condition() { return condition_; }
   std::unique_ptr<Expression>& consequent() { return consequent_; }
   std::unique_ptr<Expression>& alternative() { return alternative_; }
+  std::unique_ptr<KeywordToken>& end_token() { return end_token_; }
 
   int eval() override {
     if (condition_->eval()) {
@@ -76,9 +79,9 @@ class IfExpression : public Expression {
   }
   void print() override { std::cout << to_string() << std::endl; }
   std::string to_string() override {
-    return "If\ncondition:" + condition_->to_string() +
-           "\nthen:" + consequent_->to_string() +
-           "\nelse:" + alternative_->to_string();
+    return "If\n\tcondition:" + condition_->to_string() +
+           "\n\tthen:" + consequent_->to_string() +
+           "\n\telse:" + alternative_->to_string();
   }
 
  private:
@@ -88,6 +91,7 @@ class IfExpression : public Expression {
   std::unique_ptr<Expression> condition_;
   std::unique_ptr<Expression> consequent_;
   std::unique_ptr<Expression> alternative_;
+  std::unique_ptr<KeywordToken> end_token_;
 };
 
 class BinaryExpression : public Expression {

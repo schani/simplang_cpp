@@ -31,11 +31,11 @@ TEST_F(ParserTest, ParsesIfExpression) {
   ASSERT_TRUE(lexer_worked);
   Parser parser(std::move(lexer.tokens()));
   bool parser_worked = parser.parse();
-  // ASSERT_TRUE(parser_worked);
+  ASSERT_TRUE(parser_worked);
 
-  // auto ast = parser.ast();
-  // EXPECT_EQ(ast->root()->type(), ExpressionType::IF);
-  // EXPECT_TRUE(ast->root()->eval());
+  auto ast = parser.ast();
+  EXPECT_EQ(ast->root()->type(), ExpressionType::IF);
+  EXPECT_TRUE(ast->root()->eval());
 }
 
 }  // namespace
