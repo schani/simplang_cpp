@@ -13,6 +13,12 @@ class Parser {
   bool parse();
   std::unique_ptr<Expression> parse_primary_expression();
   std::unique_ptr<Expression> parse_binary_expression();
+  void print_tokens() {
+    while (!tokens_.empty()) {
+      tokens_.front()->print();
+      tokens_.pop();
+    }
+  }
   // TODO: check if move needed.
   std::unique_ptr<Ast> ast() { return std::move(ast_); }
 

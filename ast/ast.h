@@ -104,6 +104,16 @@ class BinaryExpression : public Expression {
            "\nright:" + right_->to_string() + "\nop:" + op_;
   }
   void print() override { std::cout << to_string() << std::endl; }
+  int eval() override {
+    if (op_ == "+") {
+      return left_->eval() + right_->eval();
+    } else if (op_ == "*") {
+      return left_->eval() * right_->eval();
+    } else if (op_ == "<") {
+      return left_->eval() < right_->eval();
+    }
+    return 0;
+  }
 
  private:
   std::unique_ptr<Expression> left_;
