@@ -93,7 +93,7 @@ class IfExpression : public Expression {
 class BinaryExpression : public Expression {
  public:
   BinaryExpression(std::unique_ptr<Expression> left,
-                   std::unique_ptr<Expression> right, const std::string& op)
+                   std::unique_ptr<Expression> right, Operator op)
       : Expression(ExpressionType::IF),
         left_(std::move(left)),
         right_(std::move(right)),
@@ -101,15 +101,15 @@ class BinaryExpression : public Expression {
 
   std::string to_string() override {
     return "BinaryExpression\nleft:" + left_->to_string() +
-           "\nright:" + right_->to_string() + "\nop:" + op_;
+           "\nright:" + right_->to_string() + "\nop:" + op_to_string(op_);
   }
   void print() override { std::cout << to_string() << std::endl; }
   int eval() override {
-    if (op_ == "+") {
+    if (op_ == Operator::PLUS) {
       return left_->eval() + right_->eval();
-    } else if (op_ == "*") {
+    } else if (op_ == Operator::TIMES) {
       return left_->eval() * right_->eval();
-    } else if (op_ == "<") {
+    } else if (op_ == Operator::LESS_THAN) {
       return left_->eval() < right_->eval();
     }
     return 0;
@@ -118,7 +118,7 @@ class BinaryExpression : public Expression {
  private:
   std::unique_ptr<Expression> left_;
   std::unique_ptr<Expression> right_;
-  std::string op_;
+  Operator op_;
 };
 
 class Ast {
