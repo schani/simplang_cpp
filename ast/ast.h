@@ -24,9 +24,17 @@ class Expression {
  public:
   Expression(ExpressionType type) : type_(type) {}
   virtual int eval() = 0;
-  virtual void print() = 0;
-  virtual std::string to_string() = 0;
+  virtual std::string to_string(int indent = 0) = 0;
+
   ExpressionType type() { return type_; }
+
+  std::string spacing(int indent = 0) {
+    std::string result = "";
+    for (int i = 0; i < indent; ++i) {
+      result += "\t";
+    }
+    return result;
+  }
 
  private:
   ExpressionType type_;
@@ -37,10 +45,10 @@ class IntExpression : public Expression {
   IntExpression(int value)
       : Expression(ExpressionType::INTEGER), value_(value) {}
   int eval() override { return value_; }
-  void print() override {
-    std::cout << "Int expression with value:" << value_ << std::endl;
+
+  std::string to_string(int indent) override {
+    return spacing(indent) + std::to_string(value_);
   }
-  std::string to_string() override { return std::to_string(value_); }
 
  private:
   int value_;
@@ -77,11 +85,11 @@ class IfExpression : public Expression {
     }
     return alternative_->eval();
   }
-  void print() override { std::cout << to_string() << std::endl; }
-  std::string to_string() override {
-    return "If\n\tcondition:" + condition_->to_string() +
-           "\n\tthen:" + consequent_->to_string() +
-           "\n\telse:" + alternative_->to_string();
+
+  std::string to_string(int indent) override {
+    return spacing(indent) + "If\n" + condition_->to_string(indent + 1) + "\n" +
+           consequent_->to_string(indent + 1) + "\n" +
+           alternative_->to_string(indent + 1);
   }
 
  private:
@@ -103,11 +111,12 @@ class BinaryExpression : public Expression {
         right_(std::move(right)),
         op_(op) {}
 
-  std::string to_string() override {
-    return "BinaryExpression\nleft:" + left_->to_string() +
-           "\nright:" + right_->to_string() + "\nop:" + op_to_string(op_);
+  std::string to_string(int indent) override {
+    return spacing(indent) + "BinaryExpression:\n" +
+           left_->to_string(indent + 1) + "\n" + right_->to_string(indent + 1) +
+           "\n" + op_to_string(op_);
   }
-  void print() override { std::cout << to_string() << std::endl; }
+
   int eval() override {
     if (op_ == Operator::PLUS) {
       return left_->eval() + right_->eval();
@@ -115,6 +124,12 @@ class BinaryExpression : public Expression {
       return left_->eval() * right_->eval();
     } else if (op_ == Operator::LESS_THAN) {
       return left_->eval() < right_->eval();
+    } else if (op_ == Operator::LOGICAL_AND) {
+      return left_->eval() && right_->eval();
+    } else if (op_ == Operator::LOGICAL_OR) {
+      return left_->eval() || right_->eval();
+    } else if (op_ == Operator::EQUALS) {
+      return left_->eval() == right_->eval();
     }
     return 0;
   }
@@ -128,7 +143,6 @@ class BinaryExpression : public Expression {
 class Ast {
  public:
   Ast(std::unique_ptr<Expression> root) : root_(std::move(root)) {}
-  void print() { root_->print(); }
   int eval() { return root_->eval(); }
   std::unique_ptr<Expression>& root() { return root_; }
 
