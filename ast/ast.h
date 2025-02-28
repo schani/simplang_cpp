@@ -8,6 +8,8 @@ namespace simp {
 enum class ExpressionType {
   INTEGER,
   IF,
+  NOT,
+  NEGATIVE,
   BINARY,
   // IN,
   // LET,
@@ -138,6 +140,39 @@ class BinaryExpression : public Expression {
   std::unique_ptr<Expression> left_;
   std::unique_ptr<Expression> right_;
   Operator op_;
+};
+
+class NotExpression : public Expression {
+ public:
+  NotExpression(std::unique_ptr<Expression> expression)
+      : Expression(ExpressionType::NOT), expression_(std::move(expression)) {}
+
+  std::string to_string(int indent) override {
+    return spacing(indent) + "NotExpression:\n" +
+           expression_->to_string(indent + 1);
+  }
+
+  int eval() override { return !expression_->eval(); }
+
+ private:
+  std::unique_ptr<Expression> expression_;
+};
+
+class NegativeExpression : public Expression {
+ public:
+  NegativeExpression(std::unique_ptr<Expression> expression)
+      : Expression(ExpressionType::NEGATIVE),
+        expression_(std::move(expression)) {}
+
+  std::string to_string(int indent) override {
+    return spacing(indent) + "NegativeExpression:\n" +
+           expression_->to_string(indent + 1);
+  }
+
+  int eval() override { return -expression_->eval(); }
+
+ private:
+  std::unique_ptr<Expression> expression_;
 };
 
 class Ast {

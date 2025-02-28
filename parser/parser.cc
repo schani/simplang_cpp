@@ -145,9 +145,33 @@ std::unique_ptr<Expression> Parser::parse_primary_expression() {
 #ifdef DEBUG
 #endif
     }
+  } else if (token->type() == TokenType::OPERATOR) {
+#ifdef DEBUG
+    std::cout << "-------primary Parsing operator expression" << std::endl;
+#endif
+    const auto& operator_token_ptr = static_cast<OperatorToken*>(token.get());
+    auto operator_token = std::make_unique<OperatorToken>(operator_token_ptr);
+    if (operator_token->op() == Operator::UNARY_MINUS) {
+      auto expression = parse_primary_expression();
+      if (!expression) {
+#ifdef DEBUG
+        std::cout << "Expression not recognized for not expression"
+                  << std::endl;
+#endif
+        return nullptr;
+      }
+      return std::make_unique<NegativeExpression>(std::move(expression));
+    } else if (operator_token->op() == Operator::NOT) {
+      auto expression = parse_primary_expression();
+      if (!expression) {
+#ifdef DEBUG
+        std::cout << "Expression not recognized" << std::endl;
+#endif
+        return nullptr;
+      }
+      return std::make_unique<NotExpression>(std::move(expression));
+    }
   }
-  std::cout << "Expression not recognized" << std::endl;
-  return nullptr;
 }
 
 std::unique_ptr<Expression> Parser::parse_binary_expression() {
