@@ -7,6 +7,7 @@ cc_library(
      "//lexer:lexer",
     "//tokens:tokens",
      ],
+     copts = ["-std=c++20"],
   visibility = ["//:__subpackages__"],
 )
 
