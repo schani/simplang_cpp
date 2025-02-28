@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glog/logging.h>
+
 #include <iostream>
 #include <map>
 #include <string>
@@ -105,7 +107,6 @@ class Token {
 
   /**************** Virtual methods******************/
   virtual std::string to_string() = 0;
-  virtual void print() = 0;
   virtual ~Token() {}
 
  private:
@@ -119,24 +120,19 @@ class OperatorToken : public Token {
  public:
   OperatorToken(Operator op, int line, int position, std::string file_name)
       : Token(TokenType::OPERATOR, line, position, file_name), op_(op) {
-    std::cout << "(" << op_to_string(op) << ")" << "OperatorToken created"
-              << std::endl;
+    LOG(INFO) << "(" << op_to_string(op) << ")" << "OperatorToken created";
   }
 
   OperatorToken(OperatorToken* op_token)
       : Token(TokenType::OPERATOR, op_token->line(), op_token->position(),
               op_token->file_name()),
         op_(op_token->op()) {
-    std::cout << "(" << op_to_string(op_) << ")" << "OperatorToken created"
-              << std::endl;
+    LOG(INFO) << "(" << op_to_string(op_) << ")"
+              << "OperatorToken created from pointer";
   }
 
   Operator op() { return op_; }
   std::string to_string() override { return op_to_string(op_); }
-  void print() override {
-    std::cout << "OperatorToken(" << to_string() << ")" << location()
-              << std::endl;
-  }
 
   bool is_binary() {
     return op_ == Operator::PLUS || op_ == Operator::TIMES ||
@@ -145,7 +141,7 @@ class OperatorToken : public Token {
   }
 
   ~OperatorToken() {
-    std::cout << "OperatorToken(" << to_string() << ") destroyed" << std::endl;
+    LOG(INFO) << "OperatorToken(" << to_string() << ") destroyed";
   }
 
  private:
@@ -156,17 +152,12 @@ class IntegerToken : public Token {
  public:
   IntegerToken(int value, int line, int position, std::string file_name)
       : Token(TokenType::INTEGER, line, position, file_name), value_(value) {
-    std::cout << "IntegerToken created with value:" << value_ << std::endl;
+    LOG(INFO) << "IntegerToken created with value:" << value_;
   }
   int value() { return value_; }
   std::string to_string() override { return std::to_string(value_); }
-  void print() override {
-    std::cout << "IntegerToken(" << value_ << ")" << location() << std::endl;
-  }
 
-  ~IntegerToken() {
-    std::cout << "IntegerToken(" << value_ << ") destroyed" << std::endl;
-  }
+  ~IntegerToken() { LOG(INFO) << "IntegerToken(" << value_ << ") destroyed"; }
 
  private:
   const int value_;
@@ -179,9 +170,10 @@ class KeywordToken : public Token {
       : Token(TokenType::KEYWORD, line, position, file_name),
         keyword_(keyword) {
     if (!is_valid_keyword(keyword_)) {
+      LOG(ERROR) << "Invalid keyword";
       throw std::runtime_error("Invalid keyword");
     } else {
-      std::cout << "(" << keyword << ") KeywordToken created" << std::endl;
+      LOG(INFO) << "(" << keyword << ") KeywordToken created";
     }
   }
 
@@ -192,18 +184,13 @@ class KeywordToken : public Token {
     if (!is_valid_keyword(keyword_)) {
       throw std::runtime_error("Invalid keyword");
     } else {
-      std::cout << "(" << keyword_ << ") KeywordToken created" << std::endl;
+      LOG(INFO) << "(" << keyword_ << ") KeywordToken created from pointer";
     }
   }
 
   std::string keyword() { return keyword_; }
   std::string to_string() override { return Keywords[keyword_]; }
-  void print() override {
-    std::cout << "KeywordToken(" << keyword_ << ")" << location() << std::endl;
-  }
-  ~KeywordToken() {
-    std::cout << "KeywordToken(" << keyword_ << ") destroyed" << std::endl;
-  }
+  ~KeywordToken() { LOG(INFO) << "KeywordToken(" << keyword_ << ") destroyed"; }
 
  private:
   std::string keyword_;
@@ -214,16 +201,13 @@ class IdentifierToken : public Token {
   IdentifierToken(std::string name, int line, int position,
                   std::string file_name)
       : Token(TokenType::IDENTIFIER, line, position, file_name), name_(name) {
-    std::cout << "IdentifierToken(" << name_ << ") created" << std::endl;
+    LOG(INFO) << "IdentifierToken(" << name_ << ") created.";
   }
   std::string name() { return name_; }
   std::string to_string() override { return name_; }
-  void print() override {
-    std::cout << "IdentifierToken(" << name_ << ")" << location() << std::endl;
-  }
 
   ~IdentifierToken() {
-    std::cout << "IdentifierToken(" << name_ << ") destroyed" << std::endl;
+    LOG(INFO) << "IdentifierToken(" << name_ << ") destroyed";
   }
 
  private:

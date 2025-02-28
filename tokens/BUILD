@@ -1,7 +1,7 @@
 cc_library(
   name = "tokens",
   hdrs = ["tokens.h"],
-  deps = [],
+  deps = ["@glog//:glog"],
   copts = ["-std=c++20"],
   visibility = ["//:__subpackages__"],
 )

@@ -1,3 +1,7 @@
+#undef GOOGLE_STRIP_LOG
+#define GOOGLE_STRIP_LOG 1
+#include <glog/logging.h>
+
 #include <deque>
 #include <memory>
 
@@ -16,7 +20,7 @@ class Parser {
   std::unique_ptr<Expression> parse_binary_expression();
   void print_tokens() {
     while (!tokens_.empty()) {
-      tokens_.front()->print();
+      LOG(INFO) << tokens_.front()->to_string();
       tokens_.pop_front();
     }
   }

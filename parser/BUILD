@@ -6,6 +6,7 @@ cc_library(
     "//ast:ast",
      "//lexer:lexer",
     "//tokens:tokens",
+    "@glog//:glog",
      ],
      copts = ["-std=c++20"],
   visibility = ["//:__subpackages__"],

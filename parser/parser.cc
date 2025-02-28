@@ -3,7 +3,6 @@
 #include <memory>
 
 #include "tokens/tokens.h"
-#define DEBUG
 namespace simp {
 
 std::unique_ptr<KeywordToken> Parser::expect_keyword(
@@ -65,55 +64,39 @@ std::unique_ptr<OperatorToken> Parser::expect_close_paren() {
 }
 
 bool Parser::parse() {
-#ifdef DEBUG
-  std::cout << "**************Parsing***************" << std::endl;
-#endif
   auto binary_expression = parse_binary_expression();
 
-#ifdef DEBUG
-  std::cout << "-------parse expression to_string:"
-            << binary_expression->to_string() << std::endl;
-#endif
+  LOG(INFO) << "-------parse expression to_string:"
+            << binary_expression->to_string();
   if (!binary_expression) {
-#ifdef DEBUG
-    std::cout << "-------parse Failed to parse binary expression" << std::endl;
-#endif
+    LOG(ERROR) << "-------parse Failed to parse binary expression";
     return false;
   }
-#ifdef DEBUG
-  std::cout << "-------parse Parsed binary expression, making ast" << std::endl;
-#endif
+  LOG(INFO) << "-------parse Parsed binary expression, making ast";
   ast_ = std::make_unique<Ast>(std::move(binary_expression));
   return true;
 }
 
 std::unique_ptr<Expression> Parser::parse_primary_expression() {
-#ifdef DEBUG
-  std::cout << "*********Parsing primary expression*******" << std::endl;
-  std::cout << "-------primary " << tokens_.size() << " tokens left in begining"
-            << std::endl;
-#endif
+  LOG(INFO) << "*********Parsing primary expression*******" << std::endl;
+  LOG(INFO) << "-------parse has " << tokens_.size()
+            << " tokens left in begining";
   if (tokens_.size() == 0) {
+    LOG(INFO) << "-------parse no tokens left";
     return nullptr;
   }
 
   auto token = std::move(tokens_.front());
   tokens_.pop_front();
-#ifdef DEBUG
-  std::cout << "-------primary popped token and have " << tokens_.size()
-            << " tokens left before if statements" << std::endl;
-#endif
+  LOG(INFO) << "-------primary popped token and have " << tokens_.size()
+            << " tokens left before if statements";
 
   if (token->type() == TokenType::INTEGER) {
-#ifdef DEBUG
-    std::cout << "-------primary Parsing integer expression" << std::endl;
-#endif
+    LOG(INFO) << "-------primary Parsing integer expression";
     const auto& integer_token_ptr = static_cast<IntegerToken*>(token.get());
     return std::make_unique<IntExpression>(integer_token_ptr->value());
   } else if (token->type() == TokenType::KEYWORD) {
-#ifdef DEBUG
-    std::cout << "-------primary Parsing keyword expression" << std::endl;
-#endif
+    LOG(INFO) << "-------primary Parsing keyword expression" << std::endl;
     const auto& keyword_token_ptr = static_cast<KeywordToken*>(token.get());
     auto keyword_token = std::make_unique<KeywordToken>(keyword_token_ptr);
 
@@ -121,9 +104,7 @@ std::unique_ptr<Expression> Parser::parse_primary_expression() {
       auto condtion = parse_binary_expression();
       auto then_token = expect_keyword("then");
       if (!then_token) {
-#ifdef DEBUG
-        std::cout << "Token not found in if statenent" << std::endl;
-#endif
+        LOG(ERROR) << "Then not found in if statenent";
         return nullptr;
       }
       auto consequent = parse_binary_expression();
@@ -143,17 +124,12 @@ std::unique_ptr<Expression> Parser::parse_primary_expression() {
       }
       auto alternative = parse_binary_expression();
       if (!alternative) {
-#ifdef DEBUG
-        std::cout << "Alternative expression not found in if statenent"
-                  << std::endl;
-#endif
+        LOG(ERROR) << "Alternative expression not found in if statenent";
         return nullptr;
       }
       auto end_token = expect_keyword("end");
       if (!end_token) {
-#ifdef DEBUG
-        std::cout << "End token not found in if statenent" << std::endl;
-#endif
+        LOG(ERROR) << "End token not found in if statenent";
         return nullptr;
       }
       return std::make_unique<IfExpression>(
@@ -164,9 +140,7 @@ std::unique_ptr<Expression> Parser::parse_primary_expression() {
 #endif
     }
   } else if (token->type() == TokenType::OPERATOR) {
-#ifdef DEBUG
-    std::cout << "-------primary Parsing operator expression" << std::endl;
-#endif
+    LOG(INFO) << "-------primary Parsing operator expression";
     const auto& operator_token_ptr = static_cast<OperatorToken*>(token.get());
     auto operator_token = std::make_unique<OperatorToken>(operator_token_ptr);
     if (operator_token->op() == Operator::CLOSE_PAREN) {
@@ -175,38 +149,28 @@ std::unique_ptr<Expression> Parser::parse_primary_expression() {
     } else if (operator_token->op() == Operator::UNARY_MINUS) {
       auto expression = parse_primary_expression();
       if (!expression) {
-#ifdef DEBUG
-        std::cout << "Expression not recognized for not expression"
-                  << std::endl;
-#endif
+        LOG(ERROR) << "Expression not recognized for not expression";
         return nullptr;
       }
       return std::make_unique<NegativeExpression>(std::move(expression));
     } else if (operator_token->op() == Operator::NOT) {
       auto expression = parse_primary_expression();
       if (!expression) {
-#ifdef DEBUG
-        std::cout << "Expression not recognized" << std::endl;
-#endif
+        LOG(ERROR) << "Expression not recognized";
         return nullptr;
       }
       return std::make_unique<NotExpression>(std::move(expression));
     } else if (operator_token->op() == Operator::OPEN_PAREN) {
       auto expression =
           parse_binary_expression();  // this is eating up the last close paren
-      std::cout << "-------primary operator token size before expect op:"
-                << tokens_.size() << std::endl;
+
       auto close_paren = expect_close_paren();
-      std::cout << "-------primary operator token size after expect op:"
-                << "-------primary close paren op:" << close_paren->op()
-                << std::endl;
+
       if (!close_paren) {
-#ifdef DEBUG
-        std::cout << "Close paren not found" << std::endl;
-#endif
+        LOG(ERROR) << "Close paren not found";
         return nullptr;
       }
-      std::cout << "-------primary found close paren" << std::endl;
+      LOG(INFO) << "-------primary found close paren";
       return std::make_unique<ParenthesizedExpression>(
           std::move(operator_token), std::move(expression),
           std::move(close_paren));

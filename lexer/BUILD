@@ -2,7 +2,8 @@ cc_library(
   name = "lexer",
   srcs = ["lexer.cc"],
   hdrs = ["lexer.h"],
-  deps = ["//tokens:tokens"],
+  deps = ["//tokens:tokens",
+          "@glog//:glog"],
   visibility = ["//:__subpackages__"],
 )
 

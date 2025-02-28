@@ -1,32 +1,30 @@
 #include "lexer.h"
+#undef GOOGLE_STRIP_LOG
+#define GOOGLE_STRIP_LOG 1
+#include <glog/logging.h>
 
 #include <cctype>
 #include <fstream>
 #include <iostream>
 #include <memory>
-// #define DEBUG
 
 namespace simp {
 using ::std::ifstream;
 using ::std::string;
 
 void handle_bad_file(std::ifstream& file) {
-#ifdef DEBUG
-  std::cout << "*******************Unable to open file************\n";
-#endif
+  LOG(INFO) << "*******************Unable to open file************\n";
   if (file.bad()) {
-    std::cerr << "Fatal error: badbit is set." << std::endl;
+    LOG(ERROR) << "Fatal error: badbit is set.";
   } else if (file.fail()) {
     // Print a more detailed error message using
     // strerror
-    std::cerr << "Error details: " << strerror(errno) << std::endl;
+    LOG(ERROR) << "Error details: " << strerror(errno);
   }
 }
 
 bool Lexer::scan() {
-#ifdef DEBUG
-  std::cout << "Scanning file: " << file_name() << std::endl;
-#endif
+  LOG(INFO) << "Scanning file: " << file_name();
   std::ifstream f(file_name());
   if (!f.is_open()) {
     handle_bad_file(f);
@@ -37,9 +35,7 @@ bool Lexer::scan() {
   int line = 1;
   int position = 1;
   while (f.get(c)) {
-#ifdef DEBUG
-    std::cout << "--while(c=->" << c << "<-)" << std::endl;
-#endif
+    LOG(INFO) << "--while(c=->" << c << "<-)";
     if (c == '(') {
       tokens_.push_back(std::make_unique<OperatorToken>(
           Operator::OPEN_PAREN, line, position, file_name()));
@@ -83,8 +79,8 @@ bool Lexer::scan() {
             Operator::LOGICAL_OR, line, position, file_name()));
         continue;
       } else {
-        std::cerr << "Error: expected || at line:" << line
-                  << " at position:" << position << std::endl;
+        LOG(ERROR) << "Expected || at line:" << line
+                   << " at position:" << position << " but only found one |";
         return false;
       }
       continue;
@@ -96,8 +92,8 @@ bool Lexer::scan() {
             Operator::LOGICAL_AND, line, position, file_name()));
         continue;
       } else {
-        std::cerr << "Error: expected && at line:" << line
-                  << " at position:" << position << std::endl;
+        LOG(ERROR) << "Expected && at line:" << line
+                   << " at position:" << position << " but only found one &";
         return false;
       }
       continue;
@@ -128,10 +124,8 @@ bool Lexer::scan() {
         continue;
       }
     } else if (std::isspace(c)) {
-#ifdef DEBUG
-      std::cout << "----isspace" << std::endl;
-#endif
-      // ignore whitespace
+      LOG(INFO) << "----isspace" << std::endl;
+      // ignore whitespace unless it's a newline
       if (c == '\n') {
         line++;
         position = 1;
@@ -140,8 +134,9 @@ bool Lexer::scan() {
       }
     } else if (c == '_') {
       if (!std::isalpha(f.peek())) {
-        std::cerr << "Error: expected identifier at line:" << line
-                  << " at position:" << position << std::endl;
+        LOG(ERROR) << "Expected identifier at line:" << line
+                   << " at position:" << position
+                   << " but found non alpha char after _ in the front";
         return false;
       } else {
         token += c;
