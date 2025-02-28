@@ -10,6 +10,7 @@ enum class ExpressionType {
   IF,
   NOT,
   NEGATIVE,
+  PARENTHESIS,
   BINARY,
   // IN,
   // LET,
@@ -174,6 +175,30 @@ class NegativeExpression : public Expression {
 
  private:
   std::unique_ptr<Expression> expression_;
+};
+
+class ParenthesizedExpression : public Expression {
+ public:
+  ParenthesizedExpression(std::unique_ptr<OperatorToken> open_paren,
+                          std::unique_ptr<Expression> expression,
+                          std::unique_ptr<OperatorToken> close_paren)
+      : Expression(ExpressionType::PARENTHESIS),
+        open_paren_(std::move(open_paren)),
+        expression_(std::move(expression)),
+        close_paren_(std::move(close_paren)) {
+    std::cout << "ParenthesizedExpression created" << std::endl;
+    std::cout << "(" << (expression_ == nullptr) << ")" << std::endl;
+  }
+
+  std::string to_string(int indent) override {
+    return spacing(indent) + "(" + expression_->to_string() + ")";
+  }
+  int eval() override { return expression_->eval(); }
+
+ private:
+  std::unique_ptr<OperatorToken> open_paren_;
+  std::unique_ptr<Expression> expression_;
+  std::unique_ptr<OperatorToken> close_paren_;
 };
 
 class Ast {

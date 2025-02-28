@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "tokens/tokens.h"
-// #define DEBUG
+#define DEBUG
 namespace simp {
 
 std::unique_ptr<KeywordToken> Parser::expect_keyword(
@@ -42,7 +42,6 @@ std::unique_ptr<OperatorToken> Parser::expect_operator() {
   std::cout << "----------expect_operator: operator found" << std::endl;
 #endif
   const auto& operator_token = static_cast<OperatorToken*>(token.get());
-  tokens_.pop_front();
   return std::make_unique<OperatorToken>(operator_token);
 }
 
@@ -151,7 +150,10 @@ std::unique_ptr<Expression> Parser::parse_primary_expression() {
 #endif
     const auto& operator_token_ptr = static_cast<OperatorToken*>(token.get());
     auto operator_token = std::make_unique<OperatorToken>(operator_token_ptr);
-    if (operator_token->op() == Operator::UNARY_MINUS) {
+    if (operator_token->op() == Operator::CLOSE_PAREN) {
+      tokens_.push_front(std::move(operator_token));
+      return nullptr;
+    } else if (operator_token->op() == Operator::UNARY_MINUS) {
       auto expression = parse_primary_expression();
       if (!expression) {
 #ifdef DEBUG
@@ -170,6 +172,25 @@ std::unique_ptr<Expression> Parser::parse_primary_expression() {
         return nullptr;
       }
       return std::make_unique<NotExpression>(std::move(expression));
+    } else if (operator_token->op() == Operator::OPEN_PAREN) {
+      auto expression =
+          parse_binary_expression();  // this is eating up the last close paren
+      std::cout << "-------primary operator token size before expect op:"
+                << tokens_.size() << std::endl;
+      auto close_paren = expect_operator();
+      std::cout << "-------primary operator token size after expect op:"
+                << "-------primary close paren op:" << close_paren->op()
+                << std::endl;
+      if (!close_paren || close_paren->op() != Operator::CLOSE_PAREN) {
+#ifdef DEBUG
+        std::cout << "Close paren not found" << std::endl;
+#endif
+        return nullptr;
+      }
+      std::cout << "-------primary found close paren" << std::endl;
+      return std::make_unique<ParenthesizedExpression>(
+          std::move(operator_token), std::move(expression),
+          std::move(close_paren));
     }
   }
   return nullptr;
@@ -194,6 +215,10 @@ std::unique_ptr<Expression> Parser::parse_binary_expression() {
 #ifdef DEBUG
     std::cout << "-------binary No operator found, returning left" << std::endl;
 #endif
+    return left;
+  } else if (op->op() == Operator::CLOSE_PAREN) {
+    std::cout << "-------binary Close paren found, returning left" << std::endl;
+    tokens_.push_front(std::move(op));
     return left;
   }
 
