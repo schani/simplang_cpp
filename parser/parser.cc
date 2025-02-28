@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "tokens/tokens.h"
-#define DEBUG
+// #define DEBUG
 namespace simp {
 
 std::unique_ptr<KeywordToken> Parser::expect_keyword(
@@ -172,6 +172,7 @@ std::unique_ptr<Expression> Parser::parse_primary_expression() {
       return std::make_unique<NotExpression>(std::move(expression));
     }
   }
+  return nullptr;
 }
 
 std::unique_ptr<Expression> Parser::parse_binary_expression() {

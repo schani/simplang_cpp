@@ -37,6 +37,7 @@ class Expression {
     }
     return result;
   }
+  virtual ~Expression() {}
 
  private:
   ExpressionType type_;
@@ -96,10 +97,10 @@ class IfExpression : public Expression {
 
  private:
   std::unique_ptr<KeywordToken> if_token_;
-  std::unique_ptr<KeywordToken> then_token_;
-  std::unique_ptr<KeywordToken> else_token_;
   std::unique_ptr<Expression> condition_;
+  std::unique_ptr<KeywordToken> then_token_;
   std::unique_ptr<Expression> consequent_;
+  std::unique_ptr<KeywordToken> else_token_;
   std::unique_ptr<Expression> alternative_;
   std::unique_ptr<KeywordToken> end_token_;
 };
