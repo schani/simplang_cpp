@@ -109,30 +109,30 @@ class IfExpression : public Expression {
 class BinaryExpression : public Expression {
  public:
   BinaryExpression(std::unique_ptr<Expression> left,
-                   std::unique_ptr<Expression> right, Operator op)
+                   std::unique_ptr<Expression> right,
+                   std::unique_ptr<OperatorToken> operator_token)
       : Expression(ExpressionType::IF),
         left_(std::move(left)),
         right_(std::move(right)),
-        op_(op) {}
+        operator_token_(std::move(operator_token)) {}
 
   std::string to_string(int indent) override {
-    return spacing(indent) + "BinaryExpression:\n" +
-           left_->to_string(indent + 1) + "\n" + right_->to_string(indent + 1) +
-           "\n" + op_to_string(op_);
+    return spacing(indent) + op_to_string(operator_token_->op()) + "\n" +
+           left_->to_string(indent + 1) + "\n" + right_->to_string(indent + 1);
   }
 
   int eval() override {
-    if (op_ == Operator::PLUS) {
+    if (operator_token_->op() == Operator::PLUS) {
       return left_->eval() + right_->eval();
-    } else if (op_ == Operator::TIMES) {
+    } else if (operator_token_->op() == Operator::TIMES) {
       return left_->eval() * right_->eval();
-    } else if (op_ == Operator::LESS_THAN) {
+    } else if (operator_token_->op() == Operator::LESS_THAN) {
       return left_->eval() < right_->eval();
-    } else if (op_ == Operator::LOGICAL_AND) {
+    } else if (operator_token_->op() == Operator::LOGICAL_AND) {
       return left_->eval() && right_->eval();
-    } else if (op_ == Operator::LOGICAL_OR) {
+    } else if (operator_token_->op() == Operator::LOGICAL_OR) {
       return left_->eval() || right_->eval();
-    } else if (op_ == Operator::EQUALS) {
+    } else if (operator_token_->op() == Operator::EQUALS) {
       return left_->eval() == right_->eval();
     }
     return 0;
@@ -141,7 +141,7 @@ class BinaryExpression : public Expression {
  private:
   std::unique_ptr<Expression> left_;
   std::unique_ptr<Expression> right_;
-  Operator op_;
+  std::unique_ptr<OperatorToken> operator_token_;
 };
 
 class NotExpression : public Expression {

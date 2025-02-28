@@ -138,6 +138,12 @@ class OperatorToken : public Token {
               << std::endl;
   }
 
+  bool is_binary() {
+    return op_ == Operator::PLUS || op_ == Operator::TIMES ||
+           op_ == Operator::EQUALS || op_ == Operator::LOGICAL_AND ||
+           op_ == Operator::LOGICAL_OR || op_ == Operator::LESS_THAN;
+  }
+
   ~OperatorToken() {
     std::cout << "OperatorToken(" << to_string() << ") destroyed" << std::endl;
   }
