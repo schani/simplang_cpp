@@ -119,7 +119,7 @@ bool Lexer::scan() {
         token += c;
         position++;
       }
-      if (!std::isdigit(c)) {
+      if (!std::isdigit(c) || f.peek() == EOF) {
         f.unget();
         position--;
         tokens_.push_back(std::make_unique<IntegerToken>(

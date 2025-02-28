@@ -257,5 +257,21 @@ TEST_F(LexerTest, ShiftL) {
   ASSERT_THAT(tokens.size(), Eq(48));
 }
 
+TEST_F(LexerTest, NotExpression) {
+  Lexer lexer{"examples/not_expression.sl"};
+  ASSERT_THAT(lexer.file_name(), StrEq("examples/not_expression.sl"));
+  bool success = lexer.scan();
+  ASSERT_TRUE(success);
+  auto& tokens = lexer.tokens();
+  ASSERT_THAT(tokens.size(), Eq(2));
+  auto not_token = std::move(tokens.front());
+  EXPECT_THAT(not_token->type(), Eq(TokenType::OPERATOR));
+  EXPECT_THAT(not_token->to_string(), StrEq("not-operator"));
+  tokens.pop_front();
+  auto integer_token = std::move(tokens.front());
+  EXPECT_THAT(integer_token->type(), Eq(TokenType::INTEGER));
+  EXPECT_THAT(integer_token->to_string(), StrEq("1"));
+}
+
 }  // namespace
 }  // namespace simp
