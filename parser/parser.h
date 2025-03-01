@@ -1,9 +1,10 @@
 #undef GOOGLE_STRIP_LOG
-#define GOOGLE_STRIP_LOG 1
+#define GOOGLE_STRIP_LOG 0
 #include <glog/logging.h>
 
 #include <deque>
 #include <memory>
+#include <unordered_map>
 
 #include "ast/ast.h"
 #include "lexer/lexer.h"
@@ -22,8 +23,14 @@ class Parser {
   std::unique_ptr<KeywordToken> expect_keyword(const std::string& keyword);
   std::unique_ptr<OperatorToken> expect_binary_operator();
   std::unique_ptr<OperatorToken> expect_close_paren();
+  std::unique_ptr<IdentifierToken> expect_identifier();
+  std::unique_ptr<OperatorToken> expect_assign_operator();
+
   bool parse();
   std::unique_ptr<Expression> parse_primary_expression();
+  bool parse_bindings(
+      std::unique_ptr<std::unordered_map<std::string, std::unique_ptr<Binding>>>
+          bindings_map);
   std::unique_ptr<Expression> parse_binary_expression();
   void print_tokens() {
     while (!tokens_.empty()) {

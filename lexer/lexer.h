@@ -3,6 +3,9 @@
 #include <deque>
 #include <memory>
 #include <string>
+#undef GOOGLE_STRIP_LOG
+#define GOOGLE_STRIP_LOG 1
+#include <glog/logging.h>
 
 #include "tokens/tokens.h"
 

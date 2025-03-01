@@ -12,57 +12,57 @@ class ParserTest : public ::testing::Test {
   void SetUp() override {}
 };
 
-// TEST_F(ParserTest, ParsesIntExpression) {
-//   Lexer lexer("examples/just_nums.sl");
-//   bool lexer_worked = lexer.scan();
-//   ASSERT_TRUE(lexer_worked);
-//   Parser parser(std::move(lexer.tokens()));
-//   bool parser_worked = parser.parse();
-//   ASSERT_TRUE(parser_worked);
+TEST_F(ParserTest, ParsesIntExpression) {
+  Lexer lexer("examples/just_nums.sl");
+  bool lexer_worked = lexer.scan();
+  ASSERT_TRUE(lexer_worked);
+  Parser parser(std::move(lexer.tokens()));
+  bool parser_worked = parser.parse();
+  ASSERT_TRUE(parser_worked);
 
-//   auto ast = parser.ast();
-//   EXPECT_EQ(ast->root()->type(), ExpressionType::INTEGER);
-//   EXPECT_EQ(ast->root()->eval(), 1234567890);
-// }
+  auto ast = parser.ast();
+  EXPECT_EQ(ast->root()->type(), ExpressionType::INTEGER);
+  EXPECT_EQ(ast->root()->eval(), 1234567890);
+}
 
-// TEST_F(ParserTest, ParsesIfExpression) {
-//   Lexer lexer("examples/if_statement.sl");
-//   bool lexer_worked = lexer.scan();
-//   ASSERT_TRUE(lexer_worked);
-//   Parser parser(std::move(lexer.tokens()));
-//   bool parser_worked = parser.parse();
-//   ASSERT_TRUE(parser_worked);
+TEST_F(ParserTest, ParsesIfExpression) {
+  Lexer lexer("examples/if_statement.sl");
+  bool lexer_worked = lexer.scan();
+  ASSERT_TRUE(lexer_worked);
+  Parser parser(std::move(lexer.tokens()));
+  bool parser_worked = parser.parse();
+  ASSERT_TRUE(parser_worked);
 
-//   auto ast = parser.ast();
-//   EXPECT_EQ(ast->root()->type(), ExpressionType::IF);
-//   EXPECT_TRUE(ast->root()->eval());
-// }
+  auto ast = parser.ast();
+  EXPECT_EQ(ast->root()->type(), ExpressionType::IF);
+  EXPECT_TRUE(ast->root()->eval());
+}
 
-// TEST_F(ParserTest, ParsesNotExpression) {
-//   Lexer lexer("examples/not_expression.sl");
-//   bool lexer_worked = lexer.scan();
-//   ASSERT_TRUE(lexer_worked);
-//   Parser parser(std::move(lexer.tokens()));
-//   bool parser_worked = parser.parse();
-//   ASSERT_TRUE(parser_worked);
+TEST_F(ParserTest, ParsesNotExpression) {
+  Lexer lexer("examples/not_expression.sl");
+  bool lexer_worked = lexer.scan();
+  ASSERT_TRUE(lexer_worked);
+  Parser parser(std::move(lexer.tokens()));
+  bool parser_worked = parser.parse();
+  ASSERT_TRUE(parser_worked);
 
-//   auto ast = parser.ast();
-//   EXPECT_EQ(ast->root()->type(), ExpressionType::NOT);
-//   EXPECT_EQ(ast->root()->eval(), 0);
-// }
+  auto ast = parser.ast();
+  EXPECT_EQ(ast->root()->type(), ExpressionType::NOT);
+  EXPECT_EQ(ast->root()->eval(), 0);
+}
 
-// TEST_F(ParserTest, ParsesNegativeExpression) {
-//   Lexer lexer("examples/negative_expression.sl");
-//   bool lexer_worked = lexer.scan();
-//   ASSERT_TRUE(lexer_worked);
-//   Parser parser(std::move(lexer.tokens()));
-//   bool parser_worked = parser.parse();
-//   ASSERT_TRUE(parser_worked);
+TEST_F(ParserTest, ParsesNegativeExpression) {
+  Lexer lexer("examples/negative_expression.sl");
+  bool lexer_worked = lexer.scan();
+  ASSERT_TRUE(lexer_worked);
+  Parser parser(std::move(lexer.tokens()));
+  bool parser_worked = parser.parse();
+  ASSERT_TRUE(parser_worked);
 
-//   auto ast = parser.ast();
-//   EXPECT_EQ(ast->root()->type(), ExpressionType::NEGATIVE);
-//   EXPECT_EQ(ast->root()->eval(), -12345);
-// }
+  auto ast = parser.ast();
+  EXPECT_EQ(ast->root()->type(), ExpressionType::NEGATIVE);
+  EXPECT_EQ(ast->root()->eval(), -12345);
+}
 
 TEST_F(ParserTest, ParsesParenthesizedExpression) {
   Lexer lexer("examples/parenthesized_expression.sl");
@@ -75,6 +75,19 @@ TEST_F(ParserTest, ParsesParenthesizedExpression) {
   auto ast = parser.ast();
   EXPECT_EQ(ast->root()->type(), ExpressionType::PARENTHESIS);
   EXPECT_EQ(ast->root()->eval(), 3);
+}
+
+TEST_F(ParserTest, ParsesLetExpression) {
+  Lexer lexer("examples/let_expression.sl");
+  bool lexer_worked = lexer.scan();
+  ASSERT_TRUE(lexer_worked);
+  Parser parser(std::move(lexer.tokens()));
+  bool parser_worked = parser.parse();
+  ASSERT_TRUE(parser_worked);
+
+  // auto ast = parser.ast();
+  // EXPECT_EQ(ast->root()->type(), ExpressionType::LET);
+  // EXPECT_EQ(ast->root()->eval(), 3);
 }
 
 }  // namespace

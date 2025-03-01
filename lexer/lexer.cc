@@ -1,7 +1,4 @@
 #include "lexer.h"
-#undef GOOGLE_STRIP_LOG
-#define GOOGLE_STRIP_LOG 1
-#include <glog/logging.h>
 
 #include <cctype>
 #include <fstream>
@@ -124,7 +121,6 @@ bool Lexer::scan() {
         continue;
       }
     } else if (std::isspace(c)) {
-      LOG(INFO) << "----isspace" << std::endl;
       // ignore whitespace unless it's a newline
       if (c == '\n') {
         line++;

@@ -1,5 +1,7 @@
 #pragma once
 
+#undef GOOGLE_STRIP_LOG
+#define GOOGLE_STRIP_LOG 1
 #include <glog/logging.h>
 
 #include <iostream>
@@ -203,6 +205,13 @@ class IdentifierToken : public Token {
       : Token(TokenType::IDENTIFIER, line, position, file_name), name_(name) {
     LOG(INFO) << "IdentifierToken(" << name_ << ") created.";
   }
+  IdentifierToken(IdentifierToken* identifier_token)
+      : Token(TokenType::IDENTIFIER, identifier_token->line(),
+              identifier_token->position(), identifier_token->file_name()),
+        name_(identifier_token->name()) {
+    LOG(INFO) << "IdentifierToken(" << name_ << ") created from pointer.";
+  }
+
   std::string name() { return name_; }
   std::string to_string() override { return name_; }
 

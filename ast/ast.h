@@ -2,6 +2,10 @@
 #include <iostream>
 #include <memory>
 
+#undef GOOGLE_STRIP_LOG
+#define GOOGLE_STRIP_LOG 0
+#include <glog/logging.h>
+
 #include "tokens/tokens.h"
 
 namespace simp {
@@ -12,25 +16,16 @@ enum class ExpressionType {
   NEGATIVE,
   PARENTHESIS,
   BINARY,
-  // IN,
-  // LET,
-  // PLUS,
-  // MINUS,
-  // TIMES,
-  // LESS_THAN,
+  LET,
+  IDENTIFIER,
   // RECUR,
   // LOOP,
-  // AND,
-  // END,
 };
-class Expression {
+
+class ParsePrintable {
  public:
-  Expression(ExpressionType type) : type_(type) {}
-  virtual int eval() = 0;
   virtual std::string to_string(int indent = 0) = 0;
-
-  ExpressionType type() { return type_; }
-
+  virtual ~ParsePrintable() {}
   std::string spacing(int indent = 0) {
     std::string result = "";
     for (int i = 0; i < indent; ++i) {
@@ -38,6 +33,13 @@ class Expression {
     }
     return result;
   }
+};
+class Expression : public ParsePrintable {
+ public:
+  Expression(ExpressionType type) : type_(type) {}
+  virtual int eval() = 0;
+
+  ExpressionType type() { return type_; }
   virtual ~Expression() {}
 
  private:
@@ -50,7 +52,7 @@ class IntExpression : public Expression {
       : Expression(ExpressionType::INTEGER), value_(value) {}
   int eval() override { return value_; }
 
-  std::string to_string(int indent) override {
+  std::string to_string(int indent = 0) override {
     return spacing(indent) + std::to_string(value_);
   }
 
@@ -90,7 +92,7 @@ class IfExpression : public Expression {
     return alternative_->eval();
   }
 
-  std::string to_string(int indent) override {
+  std::string to_string(int indent = 0) override {
     return spacing(indent) + "If\n" + condition_->to_string(indent + 1) + "\n" +
            consequent_->to_string(indent + 1) + "\n" +
            alternative_->to_string(indent + 1);
@@ -116,7 +118,7 @@ class BinaryExpression : public Expression {
         right_(std::move(right)),
         operator_token_(std::move(operator_token)) {}
 
-  std::string to_string(int indent) override {
+  std::string to_string(int indent = 0) override {
     return spacing(indent) + op_to_string(operator_token_->op()) + "\n" +
            left_->to_string(indent + 1) + "\n" + right_->to_string(indent + 1);
   }
@@ -149,7 +151,7 @@ class NotExpression : public Expression {
   NotExpression(std::unique_ptr<Expression> expression)
       : Expression(ExpressionType::NOT), expression_(std::move(expression)) {}
 
-  std::string to_string(int indent) override {
+  std::string to_string(int indent = 0) override {
     return spacing(indent) + "NotExpression:\n" +
            expression_->to_string(indent + 1);
   }
@@ -166,7 +168,7 @@ class NegativeExpression : public Expression {
       : Expression(ExpressionType::NEGATIVE),
         expression_(std::move(expression)) {}
 
-  std::string to_string(int indent) override {
+  std::string to_string(int indent = 0) override {
     return spacing(indent) + "NegativeExpression:\n" +
            expression_->to_string(indent + 1);
   }
@@ -186,11 +188,10 @@ class ParenthesizedExpression : public Expression {
         open_paren_(std::move(open_paren)),
         expression_(std::move(expression)),
         close_paren_(std::move(close_paren)) {
-    std::cout << "ParenthesizedExpression created" << std::endl;
-    std::cout << "(" << (expression_ == nullptr) << ")" << std::endl;
+    LOG(INFO) << "ParenthesizedExpression created" << std::endl;
   }
 
-  std::string to_string(int indent) override {
+  std::string to_string(int indent = 0) override {
     return spacing(indent) + "(" + expression_->to_string() + ")";
   }
   int eval() override { return expression_->eval(); }
@@ -199,6 +200,104 @@ class ParenthesizedExpression : public Expression {
   std::unique_ptr<OperatorToken> open_paren_;
   std::unique_ptr<Expression> expression_;
   std::unique_ptr<OperatorToken> close_paren_;
+};
+
+class Binding : public ParsePrintable {
+ public:
+  Binding(std::unique_ptr<IdentifierToken> identifier,
+          std::unique_ptr<OperatorToken> assign,
+          std::unique_ptr<Expression> expression)
+      : identifier_(std::move(identifier)),
+        assign_(std::move(assign)),
+        expression_(std::move(expression)) {
+    LOG(INFO) << "Binding created" << std::endl;
+  }
+
+  std::unique_ptr<IdentifierToken>& identifier() { return identifier_; }
+  std::unique_ptr<OperatorToken>& assign() { return assign_; }
+  std::unique_ptr<Expression>& expression() { return expression_; }
+
+  std::string to_string(int indent = 0) {
+    return spacing(indent) + identifier_->to_string() + " = " +
+           expression_->to_string();
+  }
+
+ private:
+  std::unique_ptr<IdentifierToken> identifier_;
+  std::unique_ptr<OperatorToken> assign_;
+  std::unique_ptr<Expression> expression_;
+};
+
+class LetExpression : public Expression {
+ public:
+  LetExpression(
+      std::unique_ptr<KeywordToken> let_keyword,
+      std::unique_ptr<std::unordered_map<std::string, std::unique_ptr<Binding>>>
+          bindings,
+      std::unique_ptr<KeywordToken> in_keyword,
+      std::unique_ptr<Expression> expression,
+      std::unique_ptr<KeywordToken> end_keyword)
+      : Expression(ExpressionType::LET),
+        let_keyword_(std::move(let_keyword)),
+        bindings_(std::move(bindings)),
+        in_keyword_(std::move(in_keyword)),
+        expression_(std::move(expression)),
+        end_keyword_(std::move(end_keyword)) {
+    LOG(INFO) << "LetExpression created" << std::endl;
+  }
+
+  std::string to_string(int indent = 0) override {
+    std::string result = spacing(indent) + "Let\n";
+    for (const auto& pair : *bindings_) {
+      result += spacing(indent + 1) + pair.first + " = " +
+                pair.second->to_string() + "\n";
+    }
+    result += spacing(indent) + "In\n" + expression_->to_string(indent + 1);
+    return result;
+  }
+
+  int eval() override {
+    return 1;  // TODO: implement eval
+  }
+
+  void print_bindings() {
+    for (const auto& binding : *bindings_) {
+      std::cout << binding.second->to_string() << std::endl;
+    }
+  }
+
+ private:
+  std::unique_ptr<KeywordToken> let_keyword_;
+  std::unique_ptr<std::unordered_map<std::string, std::unique_ptr<Binding>>>
+      bindings_;
+  std::unique_ptr<KeywordToken> in_keyword_;
+  std::unique_ptr<Expression> expression_;
+  std::unique_ptr<KeywordToken> end_keyword_;
+};
+
+class IdentifierExpression : public Expression {
+ public:
+  IdentifierExpression(std::string name)
+      : Expression(ExpressionType::IDENTIFIER), name_(name) {
+    LOG(INFO) << "IdentifierExpression created" << std::endl;
+  }
+
+  IdentifierExpression(IdentifierToken* identifier_token)
+      : Expression(ExpressionType::IDENTIFIER),
+        name_(identifier_token->name()) {
+    LOG(INFO) << "IdentifierExpression created from pointer" << std::endl;
+  }
+
+  std::string to_string(int indent = 0) override {
+    return spacing(indent) + name_;
+  }
+
+  int eval() override {
+    return 1;  // TODO: implement eval
+  }
+
+ private:
+  std::string name_;
 };
 
 class Ast {
