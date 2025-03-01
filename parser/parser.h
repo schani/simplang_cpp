@@ -6,12 +6,19 @@
 #include <memory>
 
 #include "ast/ast.h"
+#include "lexer/lexer.h"
 #include "tokens/tokens.h"
 namespace simp {
 class Parser {
  public:
   Parser(std::deque<std::unique_ptr<Token>> tokens)
       : tokens_(std::move(tokens)) {}
+  Parser(const std::string& file) {
+    Lexer lexer{file};
+    lexer.scan();
+    tokens_ = std::move(lexer.tokens());
+  }
+
   std::unique_ptr<KeywordToken> expect_keyword(const std::string& keyword);
   std::unique_ptr<OperatorToken> expect_binary_operator();
   std::unique_ptr<OperatorToken> expect_close_paren();
@@ -26,6 +33,7 @@ class Parser {
   }
   // TODO: check if move needed.
   std::unique_ptr<Ast> ast() { return std::move(ast_); }
+  void print_expressions() { std::cout << ast_->to_string() << std::endl; }
 
  private:
   std::deque<std::unique_ptr<Token>> tokens_;

@@ -20,6 +20,12 @@ class Lexer {
   bool scan();
   std::deque<std::unique_ptr<Token>>& tokens() { return tokens_; }
   const std::string& file_name() const { return file_name_; }
+  void print_tokens() {
+    while (!tokens_.empty()) {
+      std::cout << tokens_.front()->to_string();
+      tokens_.pop_front();
+    }
+  }
 
  private:
   const std::string file_name_;
