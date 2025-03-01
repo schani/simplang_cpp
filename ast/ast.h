@@ -206,6 +206,7 @@ class Ast {
   Ast(std::unique_ptr<Expression> root) : root_(std::move(root)) {}
   int eval() { return root_->eval(); }
   std::unique_ptr<Expression>& root() { return root_; }
+  std::string to_string() { return root_->to_string(); }
 
  private:
   std::unique_ptr<Expression> root_;
