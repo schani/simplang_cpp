@@ -1,0 +1,3 @@
+[submodule "schani"]
+	path = legacy
+	url = https://github.com/schani/SimpLang.git
