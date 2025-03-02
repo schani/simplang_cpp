@@ -1,1 +1,3 @@
-/Users/betai/Dropbox/B/Developer/VSCode/cpp/bazel/MODULE.bazel
+bazel_dep(name = "googletest", version = "1.16.0")
+
+bazel_dep(name = "glog", version = "0.7.1")
