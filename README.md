@@ -1,12 +1,23 @@
 <h1>SimpLang - A Simple Language - a C++ implementation</h1> 
 ==================================================================================
-
 All values are signed 64 bit integers.  All global definitions are
 functions.  Calls are not tail recursive.  All functions return
 values.  Functions are not first class.
 
 Some pieces in the language grammar, like `end`, are superfluous.
 They are there to make parsing and later extension easier.
+
+
+# Build and test instructions
+
+Install [bazel](https://bazel.build/install)
+
+
+Then run `bazel build //folder_name:target_name_from_build_file` to build (i.e `bazel build //lexer:lexer`)
+
+
+or `bazel test //folder_name:target_name_from_build_file` to run the tests (i.e `bazel test //parser:parser_test`)
+
 
 # Example program
 
