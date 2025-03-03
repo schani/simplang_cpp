@@ -8,17 +8,20 @@ namespace simp {
 std::unique_ptr<KeywordToken> Parser::expect_keyword(
     const std::string& keyword) {
   std::unique_ptr<Token> token = std::move(tokens_.front());
+  tokens_.pop_front(); // Always pop the front token first
+
   if (!token) {
     LOG(INFO) << "----------expect_keyword \"" << keyword << "\" not found";
+    tokens_.push_front(std::move(token));
     return nullptr;
   }
+
   if (token->type() == TokenType::KEYWORD) {
     LOG(INFO) << "----------expect_keyword keyword found";
     const auto& keyword_token = static_cast<KeywordToken*>(token.get());
 
     if (keyword_token->keyword() == keyword) {
       LOG(INFO) << "----------expect_keyword \"" << keyword << "\" match found";
-      tokens_.pop_front();
       return std::make_unique<KeywordToken>(keyword_token);
     } else {
       LOG(INFO) << "----------expect_keyword actual keyword: "
@@ -27,6 +30,7 @@ std::unique_ptr<KeywordToken> Parser::expect_keyword(
       return nullptr;
     }
   }
+  tokens_.push_front(std::move(token));
   return nullptr;
 }
 
